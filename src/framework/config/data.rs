@@ -21,12 +21,12 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct ConfigData {
-    pub default: Default_Config,
+    pub default: DefaultConfig,
     pub app: HashMap<String, String>,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Default_Config {
+pub struct DefaultConfig {
     pub cpu: AppCpu,
     pub gpu: AppGpu,
 }

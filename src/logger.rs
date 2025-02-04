@@ -15,7 +15,7 @@
 // // You should have received a copy of the GNU General Public License along
 // // with LightScheduling. If not, see <https://www.gnu.org/licenses/>.
 
-use flexi_logger::{DeferredNow, FileSpec, LogSpecification, Logger, Record};
+use flexi_logger::{DeferredNow, LogSpecification, Logger, Record};
 
 use std::{
     error::Error,
