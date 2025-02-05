@@ -23,7 +23,7 @@ use std::{
 };
 
 fn log_format(write: &mut dyn Write, now: &mut DeferredNow, record: &Record<'_>) -> io::Result<()> {
-    let time = now.format("%Y-%m-%d %H:%M");
+    let time = now.now_utc_owned();
     write!(write, "[{time} {}] {}", record.level(), record.args())?;
     Ok(())
 }
