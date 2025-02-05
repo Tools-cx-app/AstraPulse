@@ -16,16 +16,15 @@
 // // with LightScheduling. If not, see <https://www.gnu.org/licenses/>.
 
 mod cpu;
-mod gpu;
+//mod deamon;
 mod topapp;
 
 use crate::framework::config::{
-    data::{AppCpu, AppGpu, ConfigData},
+    data::{AppCpu, ConfigData},
     parser::ConfigParser,
 };
 
 use cpu::Cpu;
-use gpu::Gpu;
 use topapp::TopappDetector;
 
 #[derive(Debug)]
@@ -50,7 +49,6 @@ impl Looper {
                     match ConfigParser::app_config_parser(path) {
                         Ok(app_data) => {
                             self.apply_cpu_config(&app_data.cpu);
-                            self.apply_gpu_config(&app_data.gpu);
                             self.topapp.clone_from(&current_top);
                         }
                         Err(e) => {
@@ -59,7 +57,6 @@ impl Looper {
                     }
                 } else {
                     self.apply_cpu_config(&data.default.cpu);
-                    self.apply_gpu_config(&data.default.gpu);
                 }
             }
             std::thread::sleep(std::time::Duration::from_secs(1));
@@ -81,7 +78,7 @@ impl Looper {
                 );
                 continue;
             }
-            
+
             if let Err(e) = self.set_core_online(core_id, core.online) {
                 log::error!("无法设置核心 {} 状态: {}", core_id, e);
             }
@@ -91,14 +88,6 @@ impl Looper {
             if let Err(e) = self.write_cpu_max_freq(core.max_freq, core_id) {
                 log::error!("核心 {} 最大频率设置失败: {}", core_id, e);
             }
-        }
-    }
-    fn apply_gpu_config(&self, gpu_config: &AppGpu) {
-        if let Err(e) = self.write_gpu_min_freq(gpu_config.min_freq) {
-            log::error!("GPU最小频率设置失败：{e}");
-        }
-        if let Err(e) = self.write_gpu_max_freq(gpu_config.max_freq) {
-            log::error!("GPU最大频率设置失败：{e}");
         }
     }
 }
