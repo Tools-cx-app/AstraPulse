@@ -28,13 +28,11 @@ pub struct ConfigData {
 #[derive(Debug, Deserialize)]
 pub struct DefaultConfig {
     pub cpu: AppCpu,
-    pub gpu: AppGpu,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct ConfigApp {
     pub cpu: AppCpu,
-    pub gpu: AppGpu,
 }
 
 #[derive(Debug, Deserialize)]
@@ -48,75 +46,3 @@ pub struct CpuCore {
     pub min_freq: i32,
     pub max_freq: i32,
 }
-
-#[derive(Debug, Deserialize)]
-pub struct AppGpu {
-    pub min_freq: i32,
-    pub max_freq: i32,
-}
-
-/*
-#[derive(Debug, Deserialize)]
-pub struct AppCpu {
-    pub cpu0: AppCpu0,
-    pub cpu1: AppCpu1,
-    pub cpu2: AppCpu2,
-    pub cpu3: AppCpu3,
-    pub cpu4: AppCpu4,
-    pub cpu5: AppCpu5,
-    pub cpu6: AppCpu6,
-    pub cpu7: AppCpu7,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AppCpu0 {
-    pub online: bool,
-    pub freq: i32,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AppCpu1 {
-    pub online: bool,
-    pub freq: i32,
-}
-#[derive(Debug, Deserialize)]
-pub struct AppCpu2 {
-    pub online: bool,
-    pub freq: i32,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AppCpu3 {
-    pub online: bool,
-    pub freq: i32,
-}
-#[derive(Debug, Deserialize)]
-pub struct AppCpu4 {
-    pub online: bool,
-    pub freq: i32,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AppCpu5 {
-    pub online: bool,
-    pub freq: i32,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AppCpu6 {
-    pub online: bool,
-    pub freq: i32,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AppCpu7 {
-    pub online: bool,
-    pub freq: i32,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct AppGpu {
-    pub min_freq: i32,
-    pub max_freq: i32,
-}
-*/
