@@ -34,7 +34,18 @@ fn main() {
         std::process::exit(1);
     }
     log::info!("✅ 日志系统初始化成功");
+    log::info!(
+        "LightScheduling v{}-{}",
+        env!("CARGO_PKG_VERSION"),
+        build_type()
+    );
     framework::scheduler::init();
 }
 
-//sys/devices/system/cpu/cpu7/cpufreq/scaling_min_freq
+const fn build_type() -> &'static str {
+    if cfg!(debug_assertions) {
+        "debug"
+    } else {
+        "release"
+    }
+}
