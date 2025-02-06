@@ -8,7 +8,3 @@ max_freq = 3000000   # 3.0 GHz
 online = true
 min_freq = 1800000
 max_freq = 2500000
-
-[gpu]
-min_freq = 500       # 500 MHz
-max_freq = 1200      # 1.2 GHz

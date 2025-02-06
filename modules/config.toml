@@ -40,10 +40,6 @@ online = false
 min_freq = 800000
 max_freq = 1800000
 
-[default.gpu]
-min_freq = 300
-max_freq = 800
-
 [app]
 "com.example.game" = "config/com.example.game.toml"
 "com.example.browser" = "config/com.example.browser.toml"
