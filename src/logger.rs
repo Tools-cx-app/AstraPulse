@@ -35,7 +35,6 @@ pub fn init() -> Result<(), Box<dyn Error>> {
     Logger::with(spec)
         //.log_to_file(file?)
         .log_to_stdout()
-        .log_to_stderr()
         .format(log_format)
         .start()
         .map_err(|e| format!("无法启动日志系统: {e}"))?;
