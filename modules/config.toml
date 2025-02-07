@@ -1,45 +1,16 @@
-[default]
-[default.cpu]
-[default.cpu.cores.core0]
-online = true
-min_freq = 1000000
-max_freq = 2000000
+[default.cpu.big]
+min_freq = 1000  # 示例值，大核最小频率
+max_freq = 2000  # 示例值，大核最大频率
 
-[default.cpu.cores.core1]
-online = false
-min_freq = 800000
-max_freq = 1800000
+[default.cpu.middle]
+min_freq = 800   # 示例值，中核最小频率
+max_freq = 1800  # 示例值，中核最大频率
 
-[default.cpu.cores.core2]
-online = false
-min_freq = 800000
-max_freq = 1800000
-
-[default.cpu.cores.core3]
-online = false
-min_freq = 800000
-max_freq = 1800000
-
-[default.cpu.cores.core4]
-online = false
-min_freq = 800000
-max_freq = 1800000
-
-[default.cpu.cores.core5]
-online = false
-min_freq = 800000
-max_freq = 1800000
-
-[default.cpu.cores.core6]
-online = false
-min_freq = 800000
-max_freq = 1800000
-
-[default.cpu.cores.core7]
-online = false
-min_freq = 800000
-max_freq = 1800000
+[default.cpu.small]
+min_freq = 500   # 示例值，小核最小频率
+max_freq = 1500  # 示例值，小核最大频率
 
 [app]
-"com.example.game" = "config/com.example.game.toml"
-"com.example.browser" = "config/com.example.browser.toml"
+# 示例键值对（根据 HashMap<String, String> 结构）
+key1 = "value1"
+key2 = "value2"
