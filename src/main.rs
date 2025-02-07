@@ -39,7 +39,7 @@ fn main() {
         env!("CARGO_PKG_VERSION"),
         build_type()
     );
-    framework::scheduler::init();
+    framework::scheduler::looper::Looper::new().run();
 }
 
 const fn build_type() -> &'static str {

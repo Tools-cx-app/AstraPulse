@@ -17,30 +17,19 @@
 
 use std::process::{Command, Stdio};
 
-use log::error;
-
-use super::Looper;
-
-pub trait TopappDetector {
-    fn get_current_topapp(&self) -> String;
+#[derive(Debug)]
+pub struct Topapp {
+    topapp: String,
 }
 
-impl TopappDetector for Looper {
-    fn get_current_topapp(&self) -> String {
-        let output = match Command::new("sh")
-            .arg("-c")
-            .arg("dumpsys activity activities | grep mCurrentFocus")
-            .stdout(Stdio::piped())
-            .output()
-        {
-            Ok(o) => o,
-            Err(e) => {
-                error!("执行dumpsys命令失败: {}", e);
-                return String::new();
-            }
-        };
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        parse_topapp_from_dumpsys(&stdout)
+impl Topapp {
+    pub fn new() -> Self {
+        Self {
+            topapp: get_current_topapp(),
+        }
+    }
+    pub fn eq(&self, s: &String) -> bool {
+        self.topapp == *s
     }
 }
 
@@ -54,4 +43,21 @@ fn parse_topapp_from_dumpsys(output: &str) -> String {
                 .map(|s| s.split('/').next().unwrap_or("").to_string())
         })
         .unwrap_or_default()
+}
+
+fn get_current_topapp() -> String {
+    let output = match Command::new("sh")
+        .arg("-c")
+        .arg("dumpsys activity activities | grep mCurrentFocus")
+        .stdout(Stdio::piped())
+        .output()
+    {
+        Ok(o) => o,
+        Err(e) => {
+            log::error!("执行dumpsys命令失败: {}", e);
+            return String::new();
+        }
+    };
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    parse_topapp_from_dumpsys(&stdout)
 }
