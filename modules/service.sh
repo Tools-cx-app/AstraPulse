@@ -3,4 +3,5 @@
 # 这将使你的脚本更加兼容，即使Magisk在未来改变了它的挂载点
 MODDIR=${0%/*}
 
+chnod x $MODDIR/LightScheduling
 $MODDIR/LightScheduling >$MODDIR/run.log
