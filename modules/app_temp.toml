@@ -1,11 +1,14 @@
 [cpu.big]
-min_freq = 2000000   # 2.0 GHz
-max_freq = 3000000   # 3.0 GHz
+min_freq = 1300000
+max_freq = 3050000
+model = "sugov_ext"
 
 [cpu.middle]
-min_freq = 1800000
-max_freq = 2500000
+min_freq = 400000
+max_freq = 2850000
+model = "sugov_ext"
 
 [cpu.small]
-min_freq = 1800000
-max_freq = 2500000
+min_freq = 200000
+max_freq = 1800000
+model = "sugov_ext"

@@ -1,16 +1,17 @@
 [default.cpu.big]
-min_freq = 1000  # 示例值，大核最小频率
-max_freq = 2000  # 示例值，大核最大频率
+min_freq = 1300000
+max_freq = 3050000
+model = "sugov_ext"
 
 [default.cpu.middle]
-min_freq = 800   # 示例值，中核最小频率
-max_freq = 1800  # 示例值，中核最大频率
+min_freq = 400000
+max_freq = 2850000
+model = "sugov_ext"
 
 [default.cpu.small]
-min_freq = 500   # 示例值，小核最小频率
-max_freq = 1500  # 示例值，小核最大频率
+min_freq = 200000
+max_freq = 1800000
+model = "sugov_ext"
 
 [app]
-# 示例键值对（根据 HashMap<String, String> 结构）
-key1 = "value1"
-key2 = "value2"
+"mt.bin.plus" = "/path/to/file"
