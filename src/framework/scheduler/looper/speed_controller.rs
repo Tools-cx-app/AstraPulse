@@ -15,29 +15,33 @@
 // // // You should have received a copy of the GNU General Public License along
 // // // with LightScheduling. If not, see <https://www.gnu.org/licenses/>.
 
-use std::{fs, io, os::unix::fs::PermissionsExt, path};
+use std::{fs, io, os::unix::fs::PermissionsExt};
 
+#[allow(clippy::pedantic)]
 #[derive(Debug)]
 pub struct SpeedController {
     controller: String,
-    //system_controller: String,
 }
 
+#[allow(clippy::pedantic)]
 impl SpeedController {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             controller: String::new(),
-            //system_controller: String::new(),
         }
     }
     pub fn change_controller(
-        &mut self,
+        &self,
         controller: String,
         policy_id: i32,
     ) -> Result<(), io::Error> {
         let path = format!("/sys/devices/system/cpu/cpufreq/policy{policy_id}/scaling_governor");
-        let available_governors: Vec<&str> = self.controller.split_whitespace().collect();
-        if available_governors.contains(&controller.as_str()) {
+        // let available_governors: Vec<&str> = self.controller.split_whitespace().collect();
+        if self
+            .controller
+            .split_whitespace()
+            .any(|x| x == controller.as_str())
+        {
             let write_permissions = fs::Permissions::from_mode(0o600);
             fs::set_permissions(&path, write_permissions)?;
             fs::write(&path, &controller)?;
@@ -48,7 +52,7 @@ impl SpeedController {
         } else {
             Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
-                format!("调速器 {} 不可用于策略 {}", controller, policy_id),
+                format!("调速器 {controller} 不可用于策略 {policy_id}"),
             ))
         }
     }

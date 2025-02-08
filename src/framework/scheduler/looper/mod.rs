@@ -53,6 +53,7 @@ impl Looper {
                 return;
             }
         };
+        let mut controller = SpeedController::new();
         loop {
             for (app, path) in &config.app {
                 if self.topapp.lock().unwrap().eq(app) {
@@ -64,26 +65,26 @@ impl Looper {
                     let _ = self.write_cpu_min_freq(app_config.cpu.middle.min_freq, 4);
                     let _ = self.write_cpu_max_freq(app_config.cpu.small.max_freq, 0);
                     let _ = self.write_cpu_min_freq(app_config.cpu.small.min_freq, 0);
-                    let _ = ontroller.read_system_controller(7);
+                    let _ = controller.read_system_controller(7);
                     let _ = controller.change_controller(app_config.cpu.big.model, 7);
-                    let _ = ontroller.read_system_controller(4);
+                    let _ = controller.read_system_controller(4);
                     let _ = controller.change_controller(app_config.cpu.middle.model, 4);
-                    let _ = ontroller.read_system_controller(0);
+                    let _ = controller.read_system_controller(0);
                     let _ = controller.change_controller(app_config.cpu.small.model, 0);
                 } else {
-                    let mut controller = SpeedController::new();
                     let _ = self.write_cpu_max_freq(config.default.cpu.big.max_freq, 7);
                     let _ = self.write_cpu_min_freq(config.default.cpu.big.min_freq, 7);
                     let _ = self.write_cpu_max_freq(config.default.cpu.middle.max_freq, 4);
                     let _ = self.write_cpu_min_freq(config.default.cpu.middle.min_freq, 4);
                     let _ = self.write_cpu_max_freq(config.default.cpu.small.max_freq, 0);
                     let _ = self.write_cpu_min_freq(config.default.cpu.small.min_freq, 0);
-                    let _ = ontroller.read_system_controller(7);
-                    let _ = controller.change_controller(config.cpu.big.model, 7);
-                    let _ = ontroller.read_system_controller(4);
-                    let _ = controller.change_controller(config.cpu.middle.model, 4);
-                    let _ = ontroller.read_system_controller(0);
-                    let _ = controller.change_controller(config.cpu.small.model, 0);
+                    let _ = controller.read_system_controller(7);
+                    let _ = controller.change_controller(config.default.cpu.big.model.clone(), 7);
+                    let _ = controller.read_system_controller(4);
+                    let _ =
+                        controller.change_controller(config.default.cpu.middle.model.clone(), 4);
+                    let _ = controller.read_system_controller(0);
+                    let _ = controller.change_controller(config.default.cpu.small.model.clone(), 0);
                 }
             }
         }
