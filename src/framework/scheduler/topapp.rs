@@ -31,6 +31,9 @@ impl Topapp {
     pub fn eq(&self, s: &String) -> bool {
         self.topapp == *s
     }
+    pub fn get(&self) -> String {
+        self.topapp.clone()
+    }
 }
 
 fn parse_topapp_from_dumpsys(output: &str) -> String {
