@@ -16,14 +16,17 @@
 // // // with LightScheduling. If not, see <https://www.gnu.org/licenses/>.
 
 mod cpu;
+mod gpu;
 mod speed_controller;
 
 use std::{
     sync::{Arc, Mutex},
-    thread,
+    thread::{self, sleep},
+    time,
 };
 
 use cpu::Cpu;
+use gpu::Gpu;
 use speed_controller::SpeedController;
 
 use super::{topapp::Topapp, Scheduler};
@@ -54,9 +57,10 @@ impl Looper {
             }
         };
         let mut controller = SpeedController::new();
+        let mut condition: bool = false;
         loop {
             for (app, path) in &config.app {
-                if self.topapp.lock().unwrap().eq(app) {
+                if self.topapp.lock().unwrap().eq(app) && condition {
                     let app_config = Scheduler::new().app_config_parser(path).unwrap();
                     let mut controller = SpeedController::new();
                     let _ = self.write_cpu_max_freq(app_config.cpu.big.max_freq, 7);
@@ -71,6 +75,7 @@ impl Looper {
                     let _ = controller.change_controller(app_config.cpu.middle.model, 4);
                     let _ = controller.read_system_controller(0);
                     let _ = controller.change_controller(app_config.cpu.small.model, 0);
+                    Gpu::new(self.topapp.lock().unwrap().get()).gpu_scheduler();
                 } else {
                     let _ = self.write_cpu_max_freq(config.default.cpu.big.max_freq, 7);
                     let _ = self.write_cpu_min_freq(config.default.cpu.big.min_freq, 7);
@@ -85,7 +90,9 @@ impl Looper {
                         controller.change_controller(config.default.cpu.middle.model.clone(), 4);
                     let _ = controller.read_system_controller(0);
                     let _ = controller.change_controller(config.default.cpu.small.model.clone(), 0);
+                    condition = false;
                 }
+                sleep(time::Duration::from_millis(500));
             }
         }
     }
