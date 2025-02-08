@@ -46,4 +46,5 @@ pub struct AppCpu {
 pub struct CpuCore {
     pub min_freq: i32,
     pub max_freq: i32,
+    pub model: String,
 }
