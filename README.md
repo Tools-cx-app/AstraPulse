@@ -54,7 +54,7 @@ git clone https://github.com/Tools-cx-app/LightScheduling
 cd LightScheduling
 cargo b -r
 cp target/aarch64-unknown-linux-musl/release/LightScheduling ./modules/
-zip -9 -rq LightScheduling.zip modules # 生成LightScheduling.zip，直接刷入即可
+zip -9 -rq LightScheduling.zip modules/* # 生成LightScheduling.zip，直接刷入即可
 ```
 ## TODE
 1. 适配GPU调整
