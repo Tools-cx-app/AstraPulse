@@ -53,25 +53,32 @@ impl Gpu {
         }
     }
 
-    fn d9000(&self) {
-        let gpu_max_freq = "/sys/devices/platform/soc/13000000.mali/devfreq/13000000.mali/max_freq";
-        let gpu_min_freq = "/sys/devices/platform/soc/13000000.mali/devfreq/13000000.mali/min_freq";
+    fn gpu_adjust(&self, gpu_max_freq: &str, gpu_min_freq: &str) {
         if self.topapp.contains("com.miHoYo.ys.bilibili")
             | self.topapp.contains("com.miHoYo.Yuanshen")
         {
+            log::info!("检测到原神，已为其配置GPU");
             let _ = fs::write(gpu_min_freq, "484000000");
             let _ = fs::write(gpu_max_freq, "518000000");
         } else if self.topapp.contains("com.tencent.tmgp.pubgmhd") {
+            log::info!("检测到和平精英，已为其配置GPU");
             let _ = fs::write(gpu_min_freq, "252000000");
             let _ = fs::write(gpu_max_freq, "303000000");
         }
     }
-
     pub fn gpu_scheduler(&self) {
         if self.model.contains("Mali") {
-            if self.product.contains("mt6983") {
-                self.d9000();
+            if self.product.contains("mt6983") || self.product.contains("mt8781V") {
+                self.gpu_adjust(
+                    "/sys/devices/platform/soc/13000000.mali/devfreq/13000000.mali/max_freq",
+                    "/sys/devices/platform/soc/13000000.mali/devfreq/13000000.mali/min_freq",
+                );
             }
+        } else if self.model.contains("Adreno") {
+            self.gpu_adjust(
+                "/sys/class/kgsl/kgsl-3d0/max_freq",
+                "/sys/class/kgsl/kgsl-3d0/min_freq",
+            );
         }
     }
 }
