@@ -69,6 +69,7 @@ impl Looper {
             match maybe_app_config {
                 Some((_, config_path)) => match Scheduler::new().app_config_parser(config_path) {
                     Ok(app_config) => {
+                        let _ = cpu::Migrate::new(current_app.as_str()).setting();
                         self.apply_cpu_config(None, Some(app_config));
                         Gpu::new(self.topapp.lock().unwrap().get()).gpu_scheduler();
                     }
