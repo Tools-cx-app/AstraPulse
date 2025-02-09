@@ -46,14 +46,15 @@ model = "sugov_ext"
 ## 编译方式
 以ubuntu为例
 ```
-# 纯静态编译
+# NDK是必须的
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 rustup default nightly
-rustup target add aarch64-unknown-linux-musl
+rustup target add aarch64-linux-android
 git clone https://github.com/Tools-cx-app/LightScheduling
 cd LightScheduling
-cargo b -r
-cp target/aarch64-unknown-linux-musl/release/LightScheduling ./modules/
+cargo install cargo-ndk
+cargo ndk -t arm64-v8a build --release
+cp target/aarch64-linux-android/release/LightScheduling ./modules/
 zip -9 -rq LightScheduling.zip modules/* # 生成LightScheduling.zip，直接刷入即可
 ```
 ## TODE
