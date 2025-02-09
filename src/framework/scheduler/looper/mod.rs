@@ -91,7 +91,6 @@ impl Looper {
                     let _ = controller.change_controller(config.default.cpu.small.model.clone(), 0);
                 }
             }
-            sleep(time::Duration::from_millis(500));
         }
     }
 }
