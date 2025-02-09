@@ -19,15 +19,17 @@ mod cpu;
 mod gpu;
 mod speed_controller;
 
+use core::panic;
 use std::{
     sync::{Arc, Mutex},
-    thread::{self, sleep},
-    time,
+    thread,
 };
 
 use cpu::Cpu;
 use gpu::Gpu;
 use speed_controller::SpeedController;
+
+use crate::framework::config::data::{ConfigApp, ConfigData};
 
 use super::{topapp::Topapp, Scheduler};
 
@@ -56,41 +58,67 @@ impl Looper {
                 return;
             }
         };
-        let mut controller = SpeedController::new();
         loop {
-            for (app, path) in &config.app {
-                if self.topapp.lock().unwrap().eq(app) {
-                    let app_config = Scheduler::new().app_config_parser(path).unwrap();
-                    let mut controller = SpeedController::new();
-                    let _ = self.write_cpu_max_freq(app_config.cpu.big.max_freq, 7);
-                    let _ = self.write_cpu_min_freq(app_config.cpu.big.min_freq, 7);
-                    let _ = self.write_cpu_max_freq(app_config.cpu.middle.max_freq, 4);
-                    let _ = self.write_cpu_min_freq(app_config.cpu.middle.min_freq, 4);
-                    let _ = self.write_cpu_max_freq(app_config.cpu.small.max_freq, 0);
-                    let _ = self.write_cpu_min_freq(app_config.cpu.small.min_freq, 0);
-                    let _ = controller.read_system_controller(7);
-                    let _ = controller.change_controller(app_config.cpu.big.model, 7);
-                    let _ = controller.read_system_controller(4);
-                    let _ = controller.change_controller(app_config.cpu.middle.model, 4);
-                    let _ = controller.read_system_controller(0);
-                    let _ = controller.change_controller(app_config.cpu.small.model, 0);
-                    Gpu::new(self.topapp.lock().unwrap().get()).gpu_scheduler();
-                } else {
-                    let _ = self.write_cpu_max_freq(config.default.cpu.big.max_freq, 7);
-                    let _ = self.write_cpu_min_freq(config.default.cpu.big.min_freq, 7);
-                    let _ = self.write_cpu_max_freq(config.default.cpu.middle.max_freq, 4);
-                    let _ = self.write_cpu_min_freq(config.default.cpu.middle.min_freq, 4);
-                    let _ = self.write_cpu_max_freq(config.default.cpu.small.max_freq, 0);
-                    let _ = self.write_cpu_min_freq(config.default.cpu.small.min_freq, 0);
-                    let _ = controller.read_system_controller(7);
-                    let _ = controller.change_controller(config.default.cpu.big.model.clone(), 7);
-                    let _ = controller.read_system_controller(4);
-                    let _ =
-                        controller.change_controller(config.default.cpu.middle.model.clone(), 4);
-                    let _ = controller.read_system_controller(0);
-                    let _ = controller.change_controller(config.default.cpu.small.model.clone(), 0);
+            let current_app = {
+                let topapp = self.topapp.lock().unwrap();
+                topapp.get().clone()
+            };
+            let maybe_app_config = config
+                .app
+                .iter()
+                .find(|(app_name, _)| *app_name == &current_app);
+            match maybe_app_config {
+                Some((_, config_path)) => match Scheduler::new().app_config_parser(config_path) {
+                    Ok(app_config) => {
+                        self.apply_cpu_config(None, Some(app_config));
+                        Gpu::new(self.topapp.lock().unwrap().get()).gpu_scheduler();
+                    }
+                    Err(e) => {
+                        log::error!("应用配置[{}]加载失败: {}", config_path, e);
+                        self.apply_cpu_config(Some(config.clone()), None);
+                    }
+                },
+                None => {
+                    self.apply_cpu_config(Some(config.clone()), None);
                 }
             }
+        }
+    }
+    fn apply_cpu_config(&self, configdata: Option<ConfigData>, configapp: Option<ConfigApp>) {
+        let mut controller = SpeedController::new();
+        match configdata {
+            Some(config) => {
+                let _ = self.write_cpu_max_freq(config.default.cpu.big.max_freq, 7);
+                let _ = self.write_cpu_min_freq(config.default.cpu.big.min_freq, 7);
+                let _ = self.write_cpu_max_freq(config.default.cpu.middle.max_freq, 4);
+                let _ = self.write_cpu_min_freq(config.default.cpu.middle.min_freq, 4);
+                let _ = self.write_cpu_max_freq(config.default.cpu.small.max_freq, 0);
+                let _ = self.write_cpu_min_freq(config.default.cpu.small.min_freq, 0);
+                let _ = controller.read_system_controller(7);
+                let _ = controller.change_controller(config.default.cpu.big.model, 7);
+                let _ = controller.read_system_controller(4);
+                let _ = controller.change_controller(config.default.cpu.middle.model, 4);
+                let _ = controller.read_system_controller(0);
+                let _ = controller.change_controller(config.default.cpu.small.model, 0);
+            }
+            None => panic!(""),
+        }
+        match configapp {
+            Some(config) => {
+                let _ = self.write_cpu_max_freq(config.cpu.big.max_freq, 7);
+                let _ = self.write_cpu_min_freq(config.cpu.big.min_freq, 7);
+                let _ = self.write_cpu_max_freq(config.cpu.middle.max_freq, 4);
+                let _ = self.write_cpu_min_freq(config.cpu.middle.min_freq, 4);
+                let _ = self.write_cpu_max_freq(config.cpu.small.max_freq, 0);
+                let _ = self.write_cpu_min_freq(config.cpu.small.min_freq, 0);
+                let _ = controller.read_system_controller(7);
+                let _ = controller.change_controller(config.cpu.big.model, 7);
+                let _ = controller.read_system_controller(4);
+                let _ = controller.change_controller(config.cpu.middle.model, 4);
+                let _ = controller.read_system_controller(0);
+                let _ = controller.change_controller(config.cpu.small.model, 0);
+            }
+            None => panic!(""),
         }
     }
 }
