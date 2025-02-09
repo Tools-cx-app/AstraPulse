@@ -59,7 +59,7 @@ impl Looper {
         let mut controller = SpeedController::new();
         loop {
             for (app, path) in &config.app {
-                if self.topapp.lock().unwrap().eq(app) && state {
+                if self.topapp.lock().unwrap().eq(app) {
                     let app_config = Scheduler::new().app_config_parser(path).unwrap();
                     let mut controller = SpeedController::new();
                     let _ = self.write_cpu_max_freq(app_config.cpu.big.max_freq, 7);
