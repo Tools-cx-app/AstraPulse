@@ -57,10 +57,9 @@ impl Looper {
             }
         };
         let mut controller = SpeedController::new();
-        let mut condition: bool = false;
         loop {
             for (app, path) in &config.app {
-                if self.topapp.lock().unwrap().eq(app) && condition {
+                if self.topapp.lock().unwrap().eq(app) && state {
                     let app_config = Scheduler::new().app_config_parser(path).unwrap();
                     let mut controller = SpeedController::new();
                     let _ = self.write_cpu_max_freq(app_config.cpu.big.max_freq, 7);
@@ -90,10 +89,9 @@ impl Looper {
                         controller.change_controller(config.default.cpu.middle.model.clone(), 4);
                     let _ = controller.read_system_controller(0);
                     let _ = controller.change_controller(config.default.cpu.small.model.clone(), 0);
-                    condition = false;
                 }
-                sleep(time::Duration::from_millis(500));
             }
+            sleep(time::Duration::from_millis(500));
         }
     }
 }
