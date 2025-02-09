@@ -15,7 +15,7 @@
 // // You should have received a copy of the GNU General Public License along
 // // with LightScheduling. If not, see <https://www.gnu.org/licenses/>.
 
-use std::process::{Command, Stdio};
+use std::{thread::sleep, time};
 
 #[derive(Debug)]
 pub struct Topapp {
@@ -27,9 +27,6 @@ impl Topapp {
         Self {
             topapp: get_current_topapp(),
         }
-    }
-    pub fn eq(&self, s: &String) -> bool {
-        self.topapp == *s
     }
     pub fn get(&self) -> String {
         self.topapp.clone()
@@ -49,18 +46,17 @@ fn parse_topapp_from_dumpsys(output: &str) -> String {
 }
 
 fn get_current_topapp() -> String {
-    let output = match Command::new("sh")
-        .arg("-c")
-        .arg("dumpsys activity activities | grep mCurrentFocus")
-        .stdout(Stdio::piped())
-        .output()
-    {
-        Ok(o) => o,
-        Err(e) => {
-            log::error!("执行dumpsys命令失败: {}", e);
-            return String::new();
+    let output = loop {
+        match dumpsys_rs::Dumpsys::new("activity") {
+            Some(s) => break s,
+            None => sleep(time::Duration::from_millis(1)),
         }
     };
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    parse_topapp_from_dumpsys(&stdout)
+    match output.dump(&["activities"]) {
+        Ok(s) => parse_topapp_from_dumpsys(s.as_str()),
+        Err(e) => {
+            log::error!("无法获取Topapp：{e:?}");
+            String::new()
+        }
+    }
 }

@@ -19,7 +19,6 @@ mod cpu;
 mod gpu;
 mod speed_controller;
 
-use core::panic;
 use std::{
     sync::{Arc, Mutex},
     thread,
@@ -86,39 +85,33 @@ impl Looper {
     }
     fn apply_cpu_config(&self, configdata: Option<ConfigData>, configapp: Option<ConfigApp>) {
         let mut controller = SpeedController::new();
-        match configdata {
-            Some(config) => {
-                let _ = self.write_cpu_max_freq(config.default.cpu.big.max_freq, 7);
-                let _ = self.write_cpu_min_freq(config.default.cpu.big.min_freq, 7);
-                let _ = self.write_cpu_max_freq(config.default.cpu.middle.max_freq, 4);
-                let _ = self.write_cpu_min_freq(config.default.cpu.middle.min_freq, 4);
-                let _ = self.write_cpu_max_freq(config.default.cpu.small.max_freq, 0);
-                let _ = self.write_cpu_min_freq(config.default.cpu.small.min_freq, 0);
-                let _ = controller.read_system_controller(7);
-                let _ = controller.change_controller(config.default.cpu.big.model, 7);
-                let _ = controller.read_system_controller(4);
-                let _ = controller.change_controller(config.default.cpu.middle.model, 4);
-                let _ = controller.read_system_controller(0);
-                let _ = controller.change_controller(config.default.cpu.small.model, 0);
-            }
-            None => panic!(""),
+        if let Some(config) = configdata {
+            let _ = self.write_cpu_max_freq(config.default.cpu.big.max_freq, 7);
+            let _ = self.write_cpu_min_freq(config.default.cpu.big.min_freq, 7);
+            let _ = self.write_cpu_max_freq(config.default.cpu.middle.max_freq, 4);
+            let _ = self.write_cpu_min_freq(config.default.cpu.middle.min_freq, 4);
+            let _ = self.write_cpu_max_freq(config.default.cpu.small.max_freq, 0);
+            let _ = self.write_cpu_min_freq(config.default.cpu.small.min_freq, 0);
+            let _ = controller.read_system_controller(7);
+            let _ = controller.change_controller(config.default.cpu.big.model, 7);
+            let _ = controller.read_system_controller(4);
+            let _ = controller.change_controller(config.default.cpu.middle.model, 4);
+            let _ = controller.read_system_controller(0);
+            let _ = controller.change_controller(config.default.cpu.small.model, 0);
         }
-        match configapp {
-            Some(config) => {
-                let _ = self.write_cpu_max_freq(config.cpu.big.max_freq, 7);
-                let _ = self.write_cpu_min_freq(config.cpu.big.min_freq, 7);
-                let _ = self.write_cpu_max_freq(config.cpu.middle.max_freq, 4);
-                let _ = self.write_cpu_min_freq(config.cpu.middle.min_freq, 4);
-                let _ = self.write_cpu_max_freq(config.cpu.small.max_freq, 0);
-                let _ = self.write_cpu_min_freq(config.cpu.small.min_freq, 0);
-                let _ = controller.read_system_controller(7);
-                let _ = controller.change_controller(config.cpu.big.model, 7);
-                let _ = controller.read_system_controller(4);
-                let _ = controller.change_controller(config.cpu.middle.model, 4);
-                let _ = controller.read_system_controller(0);
-                let _ = controller.change_controller(config.cpu.small.model, 0);
-            }
-            None => panic!(""),
+        if let Some(config) = configapp {
+            let _ = self.write_cpu_max_freq(config.cpu.big.max_freq, 7);
+            let _ = self.write_cpu_min_freq(config.cpu.big.min_freq, 7);
+            let _ = self.write_cpu_max_freq(config.cpu.middle.max_freq, 4);
+            let _ = self.write_cpu_min_freq(config.cpu.middle.min_freq, 4);
+            let _ = self.write_cpu_max_freq(config.cpu.small.max_freq, 0);
+            let _ = self.write_cpu_min_freq(config.cpu.small.min_freq, 0);
+            let _ = controller.read_system_controller(7);
+            let _ = controller.change_controller(config.cpu.big.model, 7);
+            let _ = controller.read_system_controller(4);
+            let _ = controller.change_controller(config.cpu.middle.model, 4);
+            let _ = controller.read_system_controller(0);
+            let _ = controller.change_controller(config.cpu.small.model, 0);
         }
     }
 }
