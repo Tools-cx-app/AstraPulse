@@ -1,8 +1,0 @@
-# id 只能填 字母 数字 半角符号
-id=LightScheduling
-name=轻调度
-version=v1
-versionCode=1
-author=[rust@localhost] $
-description=一个轻调度，此调度不会与任何调度冲突同时此调度只会调节Cpu频率
-updateJson=
