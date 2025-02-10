@@ -32,7 +32,6 @@ impl Cpu for Looper {
         fs::write(&path, freq.to_string())?;
         let read_permissions = fs::Permissions::from_mode(0o400);
         fs::set_permissions(&path, read_permissions)?;
-        log::info!("核心集 {policy_id} 最小频率已设置为: {freq} Hz");
         Ok(())
     }
     fn write_cpu_max_freq(&self, freq: i32, policy_id: i32) -> std::io::Result<()> {
@@ -42,7 +41,6 @@ impl Cpu for Looper {
         fs::write(&path, freq.to_string())?;
         let read_permissions = fs::Permissions::from_mode(0o400);
         fs::set_permissions(&path, read_permissions)?;
-        log::info!("核心集 {policy_id} 最大频率已设置为: {freq} Hz");
         Ok(())
     }
 }

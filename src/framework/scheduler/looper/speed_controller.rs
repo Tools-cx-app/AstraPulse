@@ -43,7 +43,6 @@ impl SpeedController {
             fs::write(&path, &controller)?;
             let read_permissions = fs::Permissions::from_mode(0o400);
             fs::set_permissions(&path, read_permissions)?;
-            log::info!("核心集 {policy_id} 的调速器已设置为 {controller}");
             Ok(())
         } else {
             Err(io::Error::new(
