@@ -47,15 +47,11 @@ fn main() -> Result<()> {
     println!("cargo:rerun-if-changed=Cargo.lock");
     println!("cargo:rerun-if-changed=Cargo.toml");
     println!("cargo:rerun-if-changed=update");
-
     vergen()?;
-
     let toml = fs::read_to_string("Cargo.toml")?;
     let data: CargoConfig = toml::from_str(&toml)?;
-
     gen_module_prop(&data)?;
     update_json(&data)?;
-
     Ok(())
 }
 
@@ -69,20 +65,18 @@ fn gen_module_prop(data: &CargoConfig) -> Result<()> {
         author += &format!("{a} ");
     }
     let author = author.trim();
-
     let mut file = fs::OpenOptions::new()
         .create(true)
         .truncate(true)
         .write(true)
         .open("modules/module.prop")?;
-
     writeln!(file, "id={id}")?;
     writeln!(file, "name={}", package.name)?;
     writeln!(file, "version=v{}", package.version)?;
     writeln!(file, "versionCode={version_code}")?;
     writeln!(file, "author={author}")?;
     writeln!(file, "description={}", package.description)?;
-
+    writeln!(file, "updateJson=https://github.com/Tools-cx-app/LightScheduling/raw/main/update.json")?;
     Ok(())
 }
 
@@ -90,21 +84,18 @@ fn update_json(data: &CargoConfig) -> Result<()> {
     let version = &data.package.version;
     let version_code: usize = version.replace('.', "").trim().parse()?;
     let version = format!("v{version}");
-
     let zip_url =
         format!("https://github.com/Tools-cx-app/LightScheduling/releases/download/{version}/LightScheduling.zip");
-
-    let cn = UpdateJson {
+    let context = UpdateJson {
         versionCode: version_code,
         version: version,
         zipUrl: zip_url,
-        changelog: "https://github.com/Tools-cx-app/LightScheduling/raw/master/changelog.md"
+        changelog: "https://github.com/Tools-cx-app/LightScheduling/raw/main/changelog.md"
             .into(),
     };
+    let context = serde_json::to_string_pretty(&context)?;
 
-    let cn = serde_json::to_string_pretty(&cn)?;
-
-    fs::write("update.json", cn)?;
+    fs::write("update.json", context)?;
 
     Ok(())
 }
