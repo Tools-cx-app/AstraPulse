@@ -16,6 +16,7 @@
 // // // with LightScheduling. If not, see <https://www.gnu.org/licenses/>.
 
 use libc::{cpu_set_t, sched_setaffinity};
+
 use std::{error::Error, ffi::CStr, fs};
 
 fn set_cpu_affinity(pid: i32, cpus: &[usize]) -> Result<(), Box<dyn Error>> {
