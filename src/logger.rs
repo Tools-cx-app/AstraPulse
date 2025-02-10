@@ -16,6 +16,7 @@
 // // with LightScheduling. If not, see <https://www.gnu.org/licenses/>.
 
 use flexi_logger::{DeferredNow, LogSpecification, Logger, Record};
+use chrono::{DateTime, Utc, FixedOffset};
 
 use std::{
     error::Error,
@@ -23,17 +24,15 @@ use std::{
 };
 
 fn log_format(write: &mut dyn Write, now: &mut DeferredNow, record: &Record<'_>) -> io::Result<()> {
-    let time = now.now_utc_owned();
-    write!(write, "[{time} {}] {}", record.level(), record.args())?;
+    let utc_time: DateTime<Utc> = now.now_utc_owned();
+    let beijing_time = utc_time.with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap());
+    write!(write, "[{beijing_time} {}] {}", record.level(), record.args())?;
     Ok(())
 }
 
 pub fn init() -> Result<(), Box<dyn Error>> {
     let spec = LogSpecification::trace();
-    //let file = FileSpec::try_from("/data/adb/modules/LightScheduling/run.log")
-    //.map_err(|e| format!("无效的日志文件路径: {e}"));
     Logger::with(spec)
-        //.log_to_file(file?)
         .log_to_stdout()
         .format(log_format)
         .start()
