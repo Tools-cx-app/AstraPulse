@@ -1,6 +1,6 @@
 [package]
 name = "LightScheduling"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 description = "一个轻调度，此调度不会与任何调度冲突同时此调度只会调节Cpu频率"
 authors = ["[rust@localhost] $"]
