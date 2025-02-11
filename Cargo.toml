@@ -13,6 +13,7 @@ libc = "0.2.169"
 log = "0.4.25"
 nix = "0.29.0"
 serde = { version = "1.0.217", features = ["derive"] }
+tempfile = "3.16.0"
 toml = "0.8.19"
 
 [build-dependencies]
