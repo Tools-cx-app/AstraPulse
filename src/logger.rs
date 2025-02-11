@@ -15,8 +15,8 @@
 // // You should have received a copy of the GNU General Public License along
 // // with LightScheduling. If not, see <https://www.gnu.org/licenses/>.
 
+use chrono::{DateTime, FixedOffset, Utc};
 use flexi_logger::{DeferredNow, LogSpecification, Logger, Record};
-use chrono::{DateTime, Utc, FixedOffset};
 
 use std::{
     error::Error,
@@ -26,7 +26,12 @@ use std::{
 fn log_format(write: &mut dyn Write, now: &mut DeferredNow, record: &Record<'_>) -> io::Result<()> {
     let utc_time: DateTime<Utc> = now.now_utc_owned();
     let beijing_time = utc_time.with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap());
-    write!(write, "[{beijing_time} {}] {}", record.level(), record.args())?;
+    write!(
+        write,
+        "[{beijing_time} {}] {}",
+        record.level(),
+        record.args()
+    )?;
     Ok(())
 }
 

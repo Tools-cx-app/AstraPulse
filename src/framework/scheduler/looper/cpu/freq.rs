@@ -17,15 +17,25 @@
 
 use std::{fs, os::unix::fs::PermissionsExt};
 
-use crate::framework::scheduler::looper::Looper;
+use crate::framework::{
+    config::data::CpuCore,
+    scheduler::looper::{speed_controller::SpeedController, Looper},
+};
 
 pub trait Cpu {
-    fn write_cpu_min_freq(&self, freq: i32, policy_id: i32) -> std::io::Result<()>;
-    fn write_cpu_max_freq(&self, freq: i32, policy_id: i32) -> std::io::Result<()>;
+    fn write_cpu_min_freq(&self, freq: i32, policy_id: i8) -> std::io::Result<()>;
+    fn write_cpu_max_freq(&self, freq: i32, policy_id: i8) -> std::io::Result<()>;
+    fn configure_cpu_cluster(
+        &self,
+        config: &CpuCore,
+        cluster_id: i8,
+        controller: &mut SpeedController,
+    );
+    fn write_frequency(&self, cluster: i8, max_freq: i32, min_freq: i32);
+    fn configure_controller(&self, cluster: i8, model: &str, controller: &mut SpeedController);
 }
-
 impl Cpu for Looper {
-    fn write_cpu_min_freq(&self, freq: i32, policy_id: i32) -> std::io::Result<()> {
+    fn write_cpu_min_freq(&self, freq: i32, policy_id: i8) -> std::io::Result<()> {
         let path = format!("/sys/devices/system/cpu/cpufreq/policy{policy_id}/scaling_min_freq");
         let write_permissions = fs::Permissions::from_mode(0o600);
         fs::set_permissions(&path, write_permissions)?;
@@ -34,7 +44,7 @@ impl Cpu for Looper {
         fs::set_permissions(&path, read_permissions)?;
         Ok(())
     }
-    fn write_cpu_max_freq(&self, freq: i32, policy_id: i32) -> std::io::Result<()> {
+    fn write_cpu_max_freq(&self, freq: i32, policy_id: i8) -> std::io::Result<()> {
         let path = format!("/sys/devices/system/cpu/cpufreq/policy{policy_id}/scaling_max_freq");
         let write_permissions = fs::Permissions::from_mode(0o600);
         fs::set_permissions(&path, write_permissions)?;
@@ -42,5 +52,33 @@ impl Cpu for Looper {
         let read_permissions = fs::Permissions::from_mode(0o400);
         fs::set_permissions(&path, read_permissions)?;
         Ok(())
+    }
+    fn configure_cpu_cluster(
+        &self,
+        config: &CpuCore,
+        cluster_id: i8,
+        controller: &mut SpeedController,
+    ) {
+        self.write_frequency(cluster_id, config.max_freq, config.min_freq);
+        self.configure_controller(cluster_id, config.model.as_str(), controller);
+    }
+
+    fn write_frequency(&self, cluster: i8, max_freq: i32, min_freq: i32) {
+        if let Err(e) = self.write_cpu_max_freq(max_freq, cluster) {
+            log::error!("集群{}最大频率设置失败: {e}", cluster);
+        }
+        if let Err(e) = self.write_cpu_min_freq(min_freq, cluster) {
+            log::error!("集群{}最小频率设置失败: {e}", cluster);
+        }
+    }
+
+    fn configure_controller(&self, cluster: i8, model: &str, controller: &mut SpeedController) {
+        if let Err(e) = controller.read_system_controller(cluster) {
+            log::error!("无法读取集群{}控制器: {e}", cluster);
+            return;
+        }
+        if let Err(e) = controller.change_controller(model.to_string(), cluster) {
+            log::error!("集群{}控制器切换失败: {e}", cluster);
+        }
     }
 }

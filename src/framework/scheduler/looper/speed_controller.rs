@@ -30,7 +30,7 @@ impl SpeedController {
             controller: String::new(),
         }
     }
-    pub fn change_controller(&self, controller: String, policy_id: i32) -> Result<(), io::Error> {
+    pub fn change_controller(&self, controller: String, policy_id: i8) -> Result<(), io::Error> {
         let path = format!("/sys/devices/system/cpu/cpufreq/policy{policy_id}/scaling_governor");
         // let available_governors: Vec<&str> = self.controller.split_whitespace().collect();
         if self
@@ -51,7 +51,7 @@ impl SpeedController {
             ))
         }
     }
-    pub fn read_system_controller(&mut self, policy_id: i32) -> Result<(), io::Error> {
+    pub fn read_system_controller(&mut self, policy_id: i8) -> Result<(), io::Error> {
         let path = format!(
             "/sys/devices/system/cpu/cpufreq/policy{policy_id}/scaling_available_governors"
         );
