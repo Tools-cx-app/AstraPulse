@@ -76,7 +76,10 @@ fn gen_module_prop(data: &CargoConfig) -> Result<()> {
     writeln!(file, "versionCode={version_code}")?;
     writeln!(file, "author={author}")?;
     writeln!(file, "description={}", package.description)?;
-    writeln!(file, "updateJson=https://github.com/Tools-cx-app/LightScheduling/raw/main/update.json")?;
+    writeln!(
+        file,
+        "updateJson=https://github.com/Tools-cx-app/LightScheduling/raw/main/update.json"
+    )?;
     Ok(())
 }
 
@@ -88,10 +91,9 @@ fn update_json(data: &CargoConfig) -> Result<()> {
         format!("https://github.com/Tools-cx-app/LightScheduling/releases/download/{version}/LightScheduling.zip");
     let context = UpdateJson {
         versionCode: version_code,
-        version: version,
+        version,
         zipUrl: zip_url,
-        changelog: "https://github.com/Tools-cx-app/LightScheduling/raw/main/changelog.md"
-            .into(),
+        changelog: "https://github.com/Tools-cx-app/LightScheduling/raw/main/changelog.md".into(),
     };
     let context = serde_json::to_string_pretty(&context)?;
 
