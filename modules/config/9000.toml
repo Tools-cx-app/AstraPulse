@@ -1,0 +1,27 @@
+name=""  # 填写cpu的型号
+
+[cpuset]
+top_app = "0-3"           # 通常为性能核心区间
+background = "4-5"        # 通常为能效核心区间
+foreground = "0-5"        # 所有可用核心
+system_background = "4-5" # 系统后台任务使用的核心
+
+[freq]
+[freq.powersave]
+min = 800   # 最小频率 (MHz)
+max = 1800  # 最大频率 (MHz)
+
+# 平衡模式频率配置
+[freq.balance]
+min = 1200
+max = 2400
+
+# 性能模式频率配置
+[freq.performance]
+min = 1600
+max = 3200
+
+# 极速模式频率配置
+[freq.fast]
+min = 2000
+max = 4200

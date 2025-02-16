@@ -1,0 +1,5 @@
+rest_screen = "Powersave" # 息屏的配置
+default = "Balance" # 除息屏和[app]里的应用之外
+
+[app]
+"bin.mt.plus" = "Powersave"
