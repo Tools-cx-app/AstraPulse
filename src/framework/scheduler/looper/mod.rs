@@ -16,7 +16,7 @@
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
 mod buffer;
-mod deriver;
+pub mod deriver;
 mod screen;
 
 use std::collections::HashMap;

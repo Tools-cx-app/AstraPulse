@@ -19,7 +19,7 @@ use std::{fs::metadata, path::PathBuf, str::FromStr};
 
 use anyhow::{Context, Result};
 
-use crate::file_hander;
+use crate::{file_hander, framework::scheduler::looper::deriver::Freqs};
 
 pub struct Cpu {
     pub policy: Vec<i32>,
@@ -57,27 +57,34 @@ impl Cpu {
         Ok(())
     }
 
-fn mhz_to_khz(mhz: isize) -> isize {
-    mhz * 1000
-}
+    fn mhz_to_khz(mhz: isize) -> isize {
+        mhz * 1000
+    }
 
-    pub fn set_freqs(&self, freqs: Vec<isize>) -> Result<()> {
-        for _policy in self.policy.clone() {
+    pub fn set_freqs(&self, freqs: Freqs) -> Result<()> {
+        for policy in self.policy.clone() {
             for path in self.path.clone() {
                 let max = path.join("scaling_max_freq");
                 let min = path.join("scaling_min_freq");
-                let max_freq = Self::mhz_to_khz(*freqs.first().unwrap());
-                let min_freq = Self::mhz_to_khz(*freqs.first().unwrap());
-                file_hander::write(
-                    max.to_str().unwrap(),
-                    max_freq.to_string().as_str(),
-                )
-                .context("无法设置cpu{_policy}频率")?;
-                file_hander::write(
-                    min.to_str().unwrap(),
-                    min_freq.to_string().as_str(),
-                )
-                .context("无法设置cpu{_policy}频率")?;
+                let (max_freq, min_freq) = match policy {
+                    0 => (
+                        Self::mhz_to_khz(freqs.small.max),
+                        Self::mhz_to_khz(freqs.small.min),
+                    ),
+                    4 | 6 => (
+                        Self::mhz_to_khz(freqs.middle.max),
+                        Self::mhz_to_khz(freqs.middle.min),
+                    ),
+                    7 => (
+                        Self::mhz_to_khz(freqs.big.max),
+                        Self::mhz_to_khz(freqs.big.min),
+                    ),
+                    _ => anyhow::bail!("不支持的CPU策略: {}", policy),
+                };
+                file_hander::write(max.to_str().unwrap(), max_freq.to_string().as_str())
+                    .context("无法设置cpu{_policy}频率")?;
+                file_hander::write(min.to_str().unwrap(), min_freq.to_string().as_str())
+                    .context("无法设置cpu{_policy}频率")?;
             }
         }
         Ok(())
