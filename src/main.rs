@@ -16,15 +16,22 @@
 // You should have received a copy of the GNU General Public License along
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
-use anyhow::Context;
-
 mod cpu;
 mod file_hander;
 mod framework;
 mod logger;
 
+use anyhow::Context;
+use file_hander::write;
+
 fn main() -> anyhow::Result<(), anyhow::Error> {
     logger::log_init().context("😂无法初始化日志")?;
-    framework::scheduler::looper::Looper::new().enter_looper().context("😂无法启动")?;
+    write(
+        "/dev/cpuset/background/cgroup.procs",
+        std::process::id().to_string().as_str(),
+    )?;
+    framework::scheduler::looper::Looper::new()
+        .enter_looper()
+        .context("😂无法启动")?;
     Ok(())
 }
