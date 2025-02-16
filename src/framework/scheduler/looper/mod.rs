@@ -21,7 +21,7 @@ mod screen;
 
 use std::collections::HashMap;
 
-use anyhow::{Result};
+use anyhow::Result;
 use buffer::Buffer;
 use screen::Screen;
 use serde::Deserialize;
@@ -82,7 +82,10 @@ impl Looper {
                 && self.topapp.topapps == app
             {
                 self.last.topapp = Some(self.topapp.topapps.clone());
-                self.match_mode(mode);
+                self.match_mode(mode.clone());
+                if self.last.topapp.clone().unwrap_or_default() == self.topapp.topapps {
+                    log::info!("已为{}设置{:?}", self.topapp.topapps, mode);
+                }
             } else if self.screen.state {
                 self.match_mode(self.config.rest_screen.clone());
             } else {
@@ -101,8 +104,5 @@ impl Looper {
         };
         let _ = buffer.try_set_cpuset();
         let _ = buffer.try_set_cpu();
-        if self.last.topapp.clone().unwrap_or_default() == self.topapp.topapps {
-            log::info!("已为{}设置{:?}", self.topapp.topapps, mode);
-        }
     }
 }

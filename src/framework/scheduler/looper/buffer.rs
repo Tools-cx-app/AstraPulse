@@ -66,6 +66,8 @@ impl Buffer {
     pub fn try_set_cpu(&self) -> Result<()> {
         let mode = self.mode.clone();
         for freqs in self.deriver.clone() {
+        let soc = Self::get_soc()?;
+        if soc == freqs.name {
             let mut cpu = Cpu::new();
             let _ = cpu.get_policy();
             let _ = match mode {
@@ -74,7 +76,7 @@ impl Buffer {
                 Mode::Performance => cpu.set_freqs(freqs.freq.performance),
                 Mode::Fast => cpu.set_freqs(freqs.freq.fast),
             };
-        }
+        }}
         Ok(())
     }
 
