@@ -57,19 +57,25 @@ impl Cpu {
         Ok(())
     }
 
+fn mhz_to_khz(mhz: isize) -> isize {
+    mhz * 1000
+}
+
     pub fn set_freqs(&self, freqs: Vec<isize>) -> Result<()> {
         for _policy in self.policy.clone() {
             for path in self.path.clone() {
                 let max = path.join("scaling_max_freq");
                 let min = path.join("scaling_min_freq");
+                let max_freq = Self::mhz_to_khz(*freqs.first().unwrap());
+                let min_freq = Self::mhz_to_khz(*freqs.first().unwrap());
                 file_hander::write(
                     max.to_str().unwrap(),
-                    freqs.first().unwrap().to_string().as_str(),
+                    max_freq.to_string().as_str(),
                 )
                 .context("无法设置cpu{_policy}频率")?;
                 file_hander::write(
                     min.to_str().unwrap(),
-                    freqs.last().unwrap().to_string().as_str(),
+                    min_freq.to_string().as_str(),
                 )
                 .context("无法设置cpu{_policy}频率")?;
             }
