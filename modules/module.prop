@@ -1,7 +1,6 @@
-# id 只能填 字母 数字 半角符号
-id=template
-name=模块模板
-version=v1
-versionCode=1
-author=Pinkdoge
-description=一个简短的描述
+id=AstraPulse
+name=AstraPulse
+version=v0.1.0
+versionCode=10
+author=[rust@localhost] $
+description=专为萌新做的调度
