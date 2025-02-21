@@ -17,9 +17,12 @@
 
 use std::{fs::metadata, path::PathBuf, str::FromStr};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Ok, Result};
 
-use crate::{file_hander, framework::scheduler::looper::deriver::Freqs};
+use crate::{
+    file_hander::{read, write},
+    framework::scheduler::looper::Mode,
+};
 
 pub struct Cpu {
     pub policy: Vec<i32>,
@@ -57,33 +60,44 @@ impl Cpu {
         Ok(())
     }
 
-    fn mhz_to_khz(mhz: isize) -> isize {
-        mhz * 1000
-    }
-
-    pub fn set_freqs(&self, freqs: Freqs) -> Result<()> {
-        for policy in self.policy.clone() {
+    pub fn set_freqs(&self, mode: Mode) -> Result<()> {
+        for _policy in self.policy.clone() {
             for path in self.path.clone() {
                 let max = path.join("scaling_max_freq");
                 let min = path.join("scaling_min_freq");
-                let (max_freq, min_freq) = match policy {
-                    0 => (
-                        Self::mhz_to_khz(freqs.small.max),
-                        Self::mhz_to_khz(freqs.small.min),
-                    ),
-                    4 | 6 => (
-                        Self::mhz_to_khz(freqs.middle.max),
-                        Self::mhz_to_khz(freqs.middle.min),
-                    ),
-                    7 => (
-                        Self::mhz_to_khz(freqs.big.max),
-                        Self::mhz_to_khz(freqs.big.min),
-                    ),
-                    _ => anyhow::bail!("不支持的CPU策略: {}", policy),
-                };
-                file_hander::write(max.to_str().unwrap(), max_freq.to_string().as_str())
+                let freqs: String = read(
+                    path.join("scaling_available_frequencies")
+                        .to_string_lossy()
+                        .to_string()
+                        .as_str(),
+                )?;
+                let context: Vec<isize> = freqs
+                    .split_whitespace()
+                    .filter_map(|s| s.parse::<isize>().ok())
+                    .collect();
+                let max_freq: isize;
+                let min_freq: isize;
+                match mode {
+                    Mode::Powersave => {
+                        max_freq = context[context.len() - 5];
+                        min_freq = context[context.len() - 3];
+                    }
+                    Mode::Balance => {
+                        max_freq = context[5];
+                        min_freq = context[context.len() - 6];
+                    }
+                    Mode::Performance => {
+                        max_freq = context[1];
+                        min_freq = context[context.len() - 6];
+                    }
+                    Mode::Fast => {
+                        max_freq = context[1];
+                        min_freq = context[1];
+                    }
+                }
+                write(max.to_str().unwrap(), max_freq.to_string().as_str())
                     .context("无法设置cpu{_policy}频率")?;
-                file_hander::write(min.to_str().unwrap(), min_freq.to_string().as_str())
+                write(min.to_str().unwrap(), min_freq.to_string().as_str())
                     .context("无法设置cpu{_policy}频率")?;
             }
         }

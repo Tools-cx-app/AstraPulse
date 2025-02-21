@@ -21,28 +21,6 @@ use serde::Deserialize;
 pub struct Deriver {
     pub name: String,
     pub cpuset: Cpuset,
-    pub freq: Modefreqs,
-}
-
-#[derive(Deserialize, Clone)]
-pub struct Modefreqs {
-    pub powersave: Freqs,
-    pub balance: Freqs,
-    pub performance: Freqs,
-    pub fast: Freqs,
-}
-
-#[derive(Deserialize, Clone)]
-pub struct Freqs {
-    pub big: Freq,
-    pub middle: Freq,
-    pub small: Freq,
-}
-
-#[derive(Deserialize, Clone)]
-pub struct Freq {
-    pub max: isize,
-    pub min: isize,
 }
 
 #[derive(Deserialize, Clone)]

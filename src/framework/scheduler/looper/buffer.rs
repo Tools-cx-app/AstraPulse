@@ -71,10 +71,10 @@ impl Buffer {
                 let mut cpu = Cpu::new();
                 let _ = cpu.get_policy();
                 let _ = match mode {
-                    Mode::Powersave => cpu.set_freqs(freqs.freq.powersave),
-                    Mode::Balance => cpu.set_freqs(freqs.freq.balance),
-                    Mode::Performance => cpu.set_freqs(freqs.freq.performance),
-                    Mode::Fast => cpu.set_freqs(freqs.freq.fast),
+                    Mode::Powersave => cpu.set_freqs(mode.clone()),
+                    Mode::Balance => cpu.set_freqs(mode.clone()),
+                    Mode::Performance => cpu.set_freqs(mode.clone()),
+                    Mode::Fast => cpu.set_freqs(mode.clone()),
                 };
             }
         }
