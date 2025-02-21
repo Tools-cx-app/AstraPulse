@@ -71,12 +71,12 @@ impl Looper {
         loop {
             self.screen.get_state();
             self.topapp.topapp_dumper();
-            self.switch_mode();
+            self.change_mode();
             std::thread::sleep(std::time::Duration::from_secs(1));
         }
     }
 
-    fn switch_mode(&mut self) {
+    fn change_mode(&mut self) {
         for (app, mode) in self.config.app.clone() {
             if self.last.topapp.clone().unwrap_or_default() != self.topapp.topapps
                 && self.topapp.topapps == app
