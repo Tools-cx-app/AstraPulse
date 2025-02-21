@@ -86,6 +86,10 @@ impl Screen {
                     };
                 }
             }
+            #[cfg(debug_assertions)]
+            {
+                log::debug!("当前屏幕状态 {}", self.state);
+            }
         }
     }
 }

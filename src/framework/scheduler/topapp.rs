@@ -61,6 +61,10 @@ impl TopAppsWatcher {
                 }
             };
             self.topapps = Self::parse_top_app(&dump);
+            #[cfg(debug_assertions)]
+            {
+                log::debug!("当前顶层应用 {}", self.topapps);
+            }
         }
     }
 
