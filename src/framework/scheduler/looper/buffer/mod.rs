@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU General Public License along
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
+pub mod deriver;
+
 use std::{fs::read_dir, path::Path, process::Command};
 
 use anyhow::{Context, Ok, Result};
@@ -23,8 +25,9 @@ use crate::{
     cpu::Cpu,
     file_hander::{read, write},
 };
+use deriver::Deriver;
 
-use super::{deriver::Deriver, Mode};
+use super::Mode;
 
 #[derive(Clone)]
 pub struct Buffer {
