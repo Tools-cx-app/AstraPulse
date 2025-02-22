@@ -16,12 +16,14 @@
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
 mod buffer;
+mod policy;
 mod screen;
 
 use std::collections::HashMap;
 
 use anyhow::Result;
 use buffer::Buffer;
+use policy::Policy;
 use screen::Screen;
 use serde::Deserialize;
 
@@ -44,6 +46,7 @@ struct Last {
     topapp: Option<String>,
 }
 pub struct Looper {
+    policy: Policy,
     buffer: Buffer,
     last: Last,
     topapp: TopAppsWatcher,
@@ -54,6 +57,7 @@ pub struct Looper {
 impl Looper {
     pub fn new() -> Self {
         Self {
+            policy: Policy::new(),
             buffer: Buffer::new(Mode::Balance).unwrap(),
             last: Last { topapp: None },
             topapp: TopAppsWatcher::new(),
@@ -101,6 +105,7 @@ impl Looper {
                 && self.topapp.topapps == app
             {
                 self.last.topapp = Some(self.topapp.topapps.clone());
+                let _ = self.policy.try_set(self.topapp.topapps.clone());
                 self.match_mode(mode.clone());
                 if self.last.topapp.clone().unwrap_or_default() == self.topapp.topapps {
                     log::info!("已为{}设置{:?}", self.topapp.topapps, mode);
