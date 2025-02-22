@@ -21,10 +21,20 @@ mod file_hander;
 mod framework;
 mod logger;
 
-use anyhow::Context;
+use std::process::Command;
+
+use anyhow::{Context, Result};
 use file_hander::write;
 
-fn main() -> anyhow::Result<(), anyhow::Error> {
+fn check_process() -> Result<bool> {
+    let output = Command::new("sh").arg("-c").arg("ps -A").output()?;
+    Ok(String::from_utf8_lossy(&output.stdout).contains("AstraPulse"))
+}
+
+fn main() -> anyhow::Result<()> {
+    if check_process()? {
+        eprintln!("检测到另一个进程，正在退出");
+    }
     logger::log_init().context("😂无法初始化日志")?;
     write(
         "/dev/cpuset/background/cgroup.procs",
