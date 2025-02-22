@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License along
 # with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
+[workspace]
+members = ["builder"]
+
 [package]
 name = "AstraPulse"
 version = "1.1.0"
