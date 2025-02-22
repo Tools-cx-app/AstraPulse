@@ -18,6 +18,7 @@
 use std::io;
 
 use chrono::FixedOffset;
+use anyhow::Result;
 use flexi_logger::{DeferredNow, LogSpecification, Logger, Record};
 
 fn log_format(
@@ -37,8 +38,12 @@ fn log_format(
     )
 }
 
-pub fn log_init() -> anyhow::Result<()> {
-    let logger_spec = LogSpecification::info();
+pub fn log_init() -> Result<()> {
+let logger_spec = if cfg!(debug_assertions) {
+        LogSpecification::debug()
+    } else {
+        LogSpecification::info()
+    };
     Logger::with(logger_spec)
         .log_to_stdout()
         .format(log_format)
