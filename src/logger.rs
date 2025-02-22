@@ -44,7 +44,7 @@ pub fn log_init() -> anyhow::Result<()> {
         .format(log_format)
         .start()?;
     log::info!(
-        "fas-rs v{} {}, llvm-{}, rustc-{}, build by {} at {} on {},{},{}",
+        "AstraPulse v{} {}, llvm-{}, rustc-{}, build by {} at {} on {},{},{}",
         env!("CARGO_PKG_VERSION"),
         build_type(),
         env!("VERGEN_RUSTC_LLVM_VERSION"),
