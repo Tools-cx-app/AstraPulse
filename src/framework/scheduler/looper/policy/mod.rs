@@ -16,7 +16,7 @@
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
 use anyhow::Result;
-use libc::{cpu_set_t};
+use libc::cpu_set_t;
 
 use com_tencent_tmgp_pubgmhd::Pubgmhd;
 
@@ -80,12 +80,20 @@ impl Policy {
             let set_ref = &mut *set_ptr;
             libc::CPU_ZERO(set_ref);
             libc::CPU_SET(cpu, set_ref);
-            if libc::sched_setaffinity(
-                tid,
-                std::mem::size_of::<cpu_set_t>(),
-                set_ptr as *const _,
-            ) == 0
+            if libc::sched_setaffinity(tid, std::mem::size_of::<cpu_set_t>(), set_ptr as *const _)
+                == 0
             {
+                Ok(())
+            } else {
+                Err(std::io::Error::last_os_error())
+            }
+        }
+    }
+
+    fn set_scheduler(tid: libc::pid_t, policy: i32) -> Result<(), std::io::Error> {
+        unsafe {
+            let param = libc::sched_param { sched_priority: 50 };
+            if libc::sched_setscheduler(tid, policy, &param) == 0 {
                 Ok(())
             } else {
                 Err(std::io::Error::last_os_error())

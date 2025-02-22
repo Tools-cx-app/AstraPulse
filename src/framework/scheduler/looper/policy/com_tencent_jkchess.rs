@@ -26,14 +26,14 @@ pub trait Pubgmhd {
 impl Pubgmhd for Policy {
     fn pubgmhd(&mut self) -> Result<()> {
         let pid = self
-            .find_pid("com.tencent.tmgp.pubgmhd")
+            .find_pid("com.tencent.jkchess")
             .context("无法获取应用pid")?;
-        let thread_13 = self.find_tid(pid, "Thread-13").context("无法获取进程tid")?;
-        let rhithread = self.find_tid(pid, "RHIThread").context("无法获取进程tid")?;
-        Self::set_affinity(thread_13 as libc::pid_t, 6)?;
-        Self::set_scheduler(rhithread as libc::pid_t, 6)?;
-        Self::set_scheduler(thread_13 as libc::pid_t, 6)?;
-        Self::set_scheduler(rhithread as libc::pid_t, 6)?;
+        let um = self.find_tid(pid, "UnityMain").context("无法获取进程tid")?;
+        let thread_42480 = self.find_tid(pid, "UnityMain").context("无法获取进程tid")?;
+        Self::set_affinity(um as libc::pid_t, 6)?;
+        Self::set_affinity(thread_42480 as libc::pid_t, 6)?;
+        Self::set_scheduler(um as libc::pid_t, 6)?;
+        Self::set_scheduler(thread_42480 as libc::pid_t, 6)?;
         Ok(())
     }
 }
