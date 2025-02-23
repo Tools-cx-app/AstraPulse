@@ -21,20 +21,35 @@ mod file_hander;
 mod framework;
 mod logger;
 
-use std::process::Command;
+use std::ffi::OsStr;
 
 use anyhow::{Context, Result};
 use file_hander::write;
 
-fn check_process() -> Result<bool> {
-    let output = Command::new("sh").arg("-c").arg("ps -A").output()?;
-    Ok(String::from_utf8_lossy(&output.stdout).contains("AstraPulse"))
+fn check_process() {
+    let mut system = sysinfo::System::new_all();
+
+    // 刷新进程列表
+    //system.refresh_processes(sysinfo::ProcessesToUpdate::All, false);
+
+    system.refresh_all();
+    // 统计名为 "AstraPulse" 的进程数量
+    /*let process_count = system
+    .processes()
+    .values()
+    .filter(|p| p.name().eq_ignore_ascii_case("AstraPulse"))
+    .count();*/
+    let process_count = system.processes_by_name(OsStr::new("AstraPulse")).count();
+
+    // 如果存在两个或更多进程则退出
+    if process_count >= 9 {
+        eprintln!("发现 {} 个 AstraPulse 进程，程序退出", process_count);
+        std::process::exit(1);
+    }
 }
 
-fn main() -> anyhow::Result<()> {
-    if check_process()? {
-        eprintln!("检测到另一个进程，正在退出");
-    }
+fn main() -> Result<()> {
+    check_process();
     logger::log_init().context("😂无法初始化日志")?;
     write(
         "/dev/cpuset/background/cgroup.procs",
