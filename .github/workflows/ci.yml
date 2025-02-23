@@ -1,0 +1,58 @@
+#  Copyright 2023-2025, [rust@localhost] $ (@3532340532)
+# 
+#  This file is part of AstraPulse.
+# 
+#  AstraPulse is free software: you can redistribute it and/or modify it under
+#  the terms of the GNU General Public License as published by the Free
+#  Software Foundation, either version 3 of the License, or (at your option)
+#  any later version.
+# 
+#  AstraPulse is distributed in the hope that it will be useful, but WITHOUT ANY
+#  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#  details.
+# 
+#  You should have received a copy of the GNU General Public License along
+#  with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
+
+name: Build and Release Artifact
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+
+jobs:
+  build-and-release:
+    name: Build and Upload Artifact
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. 检出代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. 安装 Rust 工具链
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
+          override: true
+
+      # 3. 构建 Release 版本并生成 Artifact
+      - name: Build Release Artifact
+        run: |
+          cargo builder build -r
+          # 确保 output 目录存在（如果 builder 不会自动创建）
+          mkdir -p output
+
+      # 4. 上传构建产物
+      - name: Upload Release Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AstraPulse-Release
+          path: output/AstraPulse-(release).zip
+          retention-days: 7
