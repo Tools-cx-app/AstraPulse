@@ -19,12 +19,12 @@ use anyhow::{Context, Result};
 
 use super::Policy;
 
-pub trait Pubgmhd {
-    fn pubgmhd(&mut self) -> Result<()>;
+pub trait Jkchess {
+    fn jkchess(&mut self) -> Result<()>;
 }
 
-impl Pubgmhd for Policy {
-    fn pubgmhd(&mut self) -> Result<()> {
+impl Jkchess for Policy {
+    fn jkchess(&mut self) -> Result<()> {
         let pid = self
             .find_pid("com.tencent.jkchess")
             .context("无法获取应用pid")?;

@@ -19,7 +19,9 @@ use anyhow::Result;
 use libc::cpu_set_t;
 
 use com_tencent_tmgp_pubgmhd::Pubgmhd;
+use com_tencent_jkchess::Jkchess;
 
+mod com_tencent_jkchess;
 mod com_tencent_tmgp_pubgmhd;
 
 pub struct Policy {
@@ -68,6 +70,7 @@ impl Policy {
     pub fn try_set(&mut self, topapps: String) -> Result<()> {
         match topapps.as_str() {
             "com.tencent.tmgp.pubgmhd" => self.pubgmhd(),
+            "com.tencent.jkchess" => self.jkchess(),
             _ => Ok(()),
         }?;
         Ok(())
