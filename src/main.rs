@@ -84,6 +84,26 @@ fn init() -> Result<()> {
             "/proc/game_opt/disable_cpufreq_limit",
         ],
     )?;
+    lock_value(
+        "0",
+        vec![
+            "/odm/bin/hw/vendor.oplus.hardware.urcc-service",
+            "/vendor/libvendor.oplus.hardware.urcc-V1-ndk.so",
+            "/dev/__properties__/u:object_r:vendor_oplus_urcc_prop:s0",
+            "/etc/init/vendor.oplus.hardware.urcc-service.rc",
+            "/odm/bin/hw/vendor.oplus.hardware.urcc-service",
+            "/system_ext/lib64/vendor.oplus.hardware.urcc-V1-ndk_platform.so",
+            "/vendor/lib/vendor.oplus.hardware.orms@1.0.so",
+            "/vendor/lib64/vendor.oplus.hardware.ormsHalService-V1-ndk.so",
+            "/odm/lib64vendor.oplus.hardware.orms@1.0.so",
+            "/odm/etc/orms/orms_core_config.xml",
+            "/sys/module/migt/parameters",
+            "/proc/sys/migt",
+            "/sys/module/metis",
+            "/data/data/com.xiaomi.joyose/databases/SmartP.db",
+            "/data/data/com.xiaomi.joyose/databases/teg_config.db",
+        ],
+    )?;
     Ok(())
 }
 
