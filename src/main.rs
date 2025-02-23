@@ -24,7 +24,7 @@ mod logger;
 use std::{fs, process::exit};
 
 use anyhow::{Context, Result};
-use file_hander::write;
+use file_hander::{lock_value, write};
 
 fn wait_boot() -> bool {
     let output = std::process::Command::new("getprop")
@@ -66,11 +66,33 @@ fn check_process() {
     }
 }
 
+fn init() -> Result<()> {
+    lock_value(
+        "0",
+        vec![
+            "/sys/module/mtk_fpsgo/parameters/perfmgr_enable",
+            "/sys/module/perfmgr/parameters/perfmgr_enable",
+            "/sys/module/perfmgr_policy/parameters/perfmgr_enable",
+            "/sys/module/perfmgr_mtk/parameters/perfmgr_enable",
+            "/sys/module/migt/parameters/glk_fbreak_enable",
+        ],
+    )?;
+    lock_value(
+        "1",
+        vec![
+            "/sys/module/migt/parameters/glk_disable",
+            "/proc/game_opt/disable_cpufreq_limit",
+        ],
+    )?;
+    Ok(())
+}
+
 fn main() -> Result<()> {
     while !wait_boot() {
         std::thread::sleep(std::time::Duration::from_secs(5));
     }
     check_process();
+    init()?;
     logger::log_init().context("😂无法初始化日志")?;
     write(
         "/dev/cpuset/background/cgroup.procs",
