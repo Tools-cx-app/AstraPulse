@@ -15,7 +15,10 @@
 // You should have received a copy of the GNU General Public License along
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
-use std::time::{Duration, Instant};
+use std::{
+    process::Command,
+    time::{Duration, Instant},
+};
 
 use dumpsys_rs::Dumpsys;
 use once_cell::sync::Lazy;
@@ -41,6 +44,7 @@ static FOCUSED_REGEX: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"mCurrentFocus=Window\{.*?\s+([a-zA-Z0-9._]+)/").unwrap());
 
 pub struct TopAppsWatcher {
+    command_dumper: String,
     dumper: Dumpsys,
     pub topapps: String,
     time: Instant,
@@ -48,15 +52,23 @@ pub struct TopAppsWatcher {
 
 impl TopAppsWatcher {
     pub fn new() -> Self {
+        let mut command_dumper = String::new();
         let dumper = loop {
             if let Some(dump) = Dumpsys::new("window") {
                 break dump;
             } else {
-                log::error!("无法获取顶层应用，正在重试");
-                std::thread::sleep(Duration::from_secs(1));
+                /*log::error!("无法获取顶层应用，正在重试");
+                std::thread::sleep(Duration::from_secs(1));*/
+                let output = Command::new("sh")
+                    .arg("-c")
+                    .arg("dumpsys window visible-apps")
+                    .output()
+                    .unwrap();
+                command_dumper = String::from_utf8_lossy(&output.stdout).to_string();
             }
         };
         Self {
+            command_dumper,
             dumper,
             topapps: String::new(),
             time: Instant::now(),
@@ -65,16 +77,20 @@ impl TopAppsWatcher {
 
     pub fn topapp_dumper(&mut self) {
         if self.time.elapsed() > RESET_TIME {
-            let dump = loop {
-                match self.dumper.dump(&["visible-apps"]) {
-                    Ok(dump) => break dump,
-                    Err(e) => {
-                        log::error!("无法获取顶层应用：{e}，正在重试");
-                        std::thread::sleep(Duration::from_secs(1));
+            if !self.command_dumper.is_empty() {
+                let dump = loop {
+                    match self.dumper.dump(&["visible-apps"]) {
+                        Ok(dump) => break dump,
+                        Err(e) => {
+                            log::error!("无法获取顶层应用：{e}，正在重试");
+                            std::thread::sleep(Duration::from_secs(1));
+                        }
                     }
-                }
-            };
-            self.topapps = Self::parse_top_app(&dump);
+                };
+                self.topapps = Self::parse_top_app(&dump);
+            } else {
+                self.topapps = Self::parse_top_app(self.command_dumper.as_str());
+            }
             #[cfg(debug_assertions)]
             {
                 log::debug!("当前顶层应用 {}", self.topapps);
