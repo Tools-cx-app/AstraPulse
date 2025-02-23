@@ -21,6 +21,8 @@ mod file_hander;
 mod framework;
 mod logger;
 
+use std::{fs, process::exit};
+
 use anyhow::{Context, Result};
 use file_hander::write;
 
@@ -43,10 +45,32 @@ fn wait_boot() -> bool {
     }
 }
 
+fn check_process() {
+    let mut count = 0;
+    if let Ok(entries) = fs::read_dir("/proc") {
+        for entry in entries.flatten() {
+            let pid = entry.file_name().into_string().unwrap_or_default();
+            if pid.parse::<u32>().is_err() {
+                continue;
+            }
+            if let Ok(cmdline) = fs::read_to_string(format!("/proc/{}/cmdline", pid)) {
+                if cmdline.contains("AstraPulse") {
+                    count += 1;
+                }
+            }
+        }
+    }
+    if count > 1 {
+        eprintln!("发现另一个进程，程序退出");
+        exit(1);
+    }
+}
+
 fn main() -> Result<()> {
     while !wait_boot() {
         std::thread::sleep(std::time::Duration::from_secs(5));
     }
+    check_process();
     logger::log_init().context("😂无法初始化日志")?;
     write(
         "/dev/cpuset/background/cgroup.procs",
