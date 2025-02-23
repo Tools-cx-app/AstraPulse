@@ -38,9 +38,9 @@ pub fn lock_value(value: &str, path: Vec<&str>) -> Result<()> {
         if fs::metadata(p).is_ok() {
             Command::new("sh")
                 .arg("-c")
-                .arg(format!("chown root:root {p}"))
-                .output()
-                .context("无法锁定文件{path}")?;
+                .arg("umount {path}")
+                .spawn()?
+                .wait()?;
             fs::set_permissions(p, fs::Permissions::from_mode(0o644))
                 .context("😂无法设置{path}的权限")?;
             fs::write(p, value).context("😂无法写入{path}")?;
