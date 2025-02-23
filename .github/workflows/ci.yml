@@ -54,6 +54,7 @@ jobs:
       # 3.构建 Release 版本并生成 Artifact
       - name: Build Release Artifact
         run: |
+          cargo install cargo-ndk
           export ANDROID_NDK_HOME=$(realpath ~/ndk_temp)
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
           cargo builder build -r
