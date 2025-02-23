@@ -21,35 +21,32 @@ mod file_hander;
 mod framework;
 mod logger;
 
-use std::ffi::OsStr;
-
 use anyhow::{Context, Result};
 use file_hander::write;
 
-fn check_process() {
-    let mut system = sysinfo::System::new_all();
-
-    // 刷新进程列表
-    //system.refresh_processes(sysinfo::ProcessesToUpdate::All, false);
-
-    system.refresh_all();
-    // 统计名为 "AstraPulse" 的进程数量
-    /*let process_count = system
-    .processes()
-    .values()
-    .filter(|p| p.name().eq_ignore_ascii_case("AstraPulse"))
-    .count();*/
-    let process_count = system.processes_by_name(OsStr::new("AstraPulse")).count();
-
-    // 如果存在两个或更多进程则退出
-    if process_count >= 9 {
-        eprintln!("发现 {} 个 AstraPulse 进程，程序退出", process_count);
-        std::process::exit(1);
+fn wait_boot() -> bool {
+    let output = std::process::Command::new("getprop")
+        .arg("sys.boot_completed")
+        .output();
+    match output {
+        Ok(output) => {
+            if let Ok(stdout) = String::from_utf8(output.stdout) {
+                stdout.trim() == "1"
+            } else {
+                false
+            }
+        }
+        Err(_) => {
+            println!("Failed to execute getprop command.");
+            false
+        }
     }
 }
 
 fn main() -> Result<()> {
-    check_process();
+    while !wait_boot() {
+        std::thread::sleep(std::time::Duration::from_secs(5));
+    }
     logger::log_init().context("😂无法初始化日志")?;
     write(
         "/dev/cpuset/background/cgroup.procs",
