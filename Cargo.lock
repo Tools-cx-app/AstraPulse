@@ -191,17 +191,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "builder"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "fs_extra",
- "zip",
- "zip-extensions",
-]
-
-[[package]]
 name = "bumpalo"
 version = "3.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1216,6 +1205,17 @@ dependencies = [
  "ntapi",
  "rayon",
  "windows",
+]
+
+[[package]]
+name = "task"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "fs_extra",
+ "zip",
+ "zip-extensions",
 ]
 
 [[package]]
