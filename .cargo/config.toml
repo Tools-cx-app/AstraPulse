@@ -16,4 +16,4 @@
 # with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
 [alias]
-builder = "run --package builder --"
+task = "run --package task --"
