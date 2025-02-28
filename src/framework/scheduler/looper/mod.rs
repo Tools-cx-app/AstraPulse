@@ -19,7 +19,7 @@ mod buffer;
 mod policy;
 mod screen;
 
-use std::collections::HashMap;
+use std::{collections::HashMap, thread};
 
 use anyhow::Result;
 use buffer::Buffer;
@@ -27,10 +27,7 @@ use policy::Policy;
 use screen::Screen;
 use serde::Deserialize;
 
-use crate::{
-    file_hander::{lock_value, read},
-    framework::config::Data,
-};
+use crate::{file_hander::read, framework::config::Data};
 
 use super::TopAppsWatcher;
 
@@ -74,28 +71,11 @@ impl Looper {
         let context = read("/data/adb/modules/AstraPulse/config.toml")?;
         let context: Data = toml::from_str(context.as_str())?;
         self.config = context;
-        lock_value(
-            "0",
-            vec![
-                "/sys/module/mtk_fpsgo/parameters/perfmgr_enable",
-                "/sys/module/perfmgr/parameters/perfmgr_enable",
-                "/sys/module/perfmgr_policy/parameters/perfmgr_enable",
-                "/sys/module/perfmgr_mtk/parameters/perfmgr_enable",
-                "/sys/module/migt/parameters/glk_fbreak_enable",
-            ],
-        )?;
-        lock_value(
-            "1",
-            vec![
-                "/sys/module/migt/parameters/glk_disable",
-                "/proc/game_opt/disable_cpufreq_limit",
-            ],
-        )?;
         loop {
             self.screen.get_state();
             self.topapp.topapp_dumper();
             self.change_mode();
-            std::thread::sleep(std::time::Duration::from_secs(1));
+            std::thread::sleep(std::time::Duration::from_millis(2));
         }
     }
 
