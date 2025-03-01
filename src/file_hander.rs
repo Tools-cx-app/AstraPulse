@@ -38,7 +38,7 @@ pub fn lock_value(value: &str, path: Vec<&str>) -> Result<()> {
         if fs::metadata(p).is_ok() {
             Command::new("sh")
                 .arg("-c")
-                .arg("umount {path}")
+                .arg(format!("umount {path}"))
                 .spawn()?
                 .wait()?;
             fs::set_permissions(p, fs::Permissions::from_mode(0o644))
