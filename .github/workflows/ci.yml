@@ -58,11 +58,11 @@ jobs:
       - name: Prepare artifacts
         run: |
           mkdir -p output/artifact/release
-          unzip "output/AstraPulse(release).zip" -d output/artifact/release
+          unzip "output/AstraPulse-(release).zip" -d output/artifact/release
       - name: Upload release version
         uses: actions/upload-artifact@v4
         with:
-          name: AstraPulse(release)
+          name: AstraPulse-(release)
           compression-level: 9
           path: output/artifact/release
   
@@ -98,11 +98,11 @@ jobs:
       - name: Prepare artifacts
         run: |
           mkdir -p output/artifact/debug
-          unzip "output/AstraPulse(debug).zip" -d output/artifact/debug
+          unzip "output/AstraPulse-(debug).zip" -d output/artifact/debug
       - name: Upload debug version
         uses: actions/upload-artifact@v4
         with:
-          name: AstraPulse(debug)3532340532
+          name: AstraPulse-(debug)3532340532
           compression-level: 9
           path: output/artifact/debug
   
@@ -121,13 +121,13 @@ jobs:
       - name: Package Artifacts
         run: |
           # 添加对产物存在的检查
-          if [ -d "${{ github.workspace }}/artifacts/AstraPulse(debug)" ]; then
-            cd "${{ github.workspace }}/artifacts/AstraPulse(debug)"
-            zip -9 -rq "../AstraPulse(debug)" .
+          if [ -d "${{ github.workspace }}/artifacts/AstraPulse-(debug)" ]; then
+            cd "${{ github.workspace }}/artifacts/AstraPulse-(debug)"
+            zip -9 -rq "../AstraPulse-(debug)" .
           fi
-          if [ -d "${{ github.workspace }}/artifacts/AstraPulse(release)" ]; then
-            cd "${{ github.workspace }}/artifacts/AstraPulse(release)"
-            zip -9 -rq "../AstraPulse(release)" .
+          if [ -d "${{ github.workspace }}/artifacts/AstraPulse-(release)" ]; then
+            cd "${{ github.workspace }}/artifacts/AstraPulse-(release)"
+            zip -9 -rq "../AstraPulse-(release)" .
           fi
       - name: Post to Debug Group
         shell: bash
@@ -146,13 +146,13 @@ jobs:
           cd ${{ github.workspace }}
           echo $COMMIT_MESSAGE_FIXED
           # 添加对产物文件存在的检查
-          if [ -f "artifacts/AstraPulse(debug).zip" ]; then
-            DEBUG_ZIP="@artifacts/AstraPulse(debug).zip"
+          if [ -f "artifacts/AstraPulse-(debug).zip" ]; then
+            DEBUG_ZIP="@artifacts/AstraPulse-(debug).zip"
           else
             DEBUG_ZIP=""
           fi
-          if [ -f "artifacts/AstraPulse(release).zip" ]; then
-            RELEASE_ZIP="@artifacts/AstraPulse(release).zip"
+          if [ -f "artifacts/AstraPulse-(release).zip" ]; then
+            RELEASE_ZIP="@artifacts/AstraPulse-(release).zip"
           else
             RELEASE_ZIP=""
           fi
