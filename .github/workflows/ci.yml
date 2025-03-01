@@ -102,7 +102,7 @@ jobs:
       - name: Upload debug version
         uses: actions/upload-artifact@v4
         with:
-          name: AstraPulse(debug)
+          name: AstraPulse(debug)3532340532
           compression-level: 9
           path: output/artifact/debug
   
