@@ -21,28 +21,18 @@ mod file_hander;
 mod framework;
 mod logger;
 
-use std::{fs, process::exit};
+use std::{
+    fs,
+    process::{Command, exit},
+};
 
 use anyhow::{Context, Result};
 use file_hander::{lock_value, write};
 
-fn wait_boot() -> bool {
-    let output = std::process::Command::new("getprop")
-        .arg("sys.boot_completed")
-        .output();
-    match output {
-        Ok(output) => {
-            if let Ok(stdout) = String::from_utf8(output.stdout) {
-                stdout.trim() == "1"
-            } else {
-                false
-            }
-        }
-        Err(_) => {
-            println!("Failed to execute getprop command.");
-            false
-        }
-    }
+fn wait_boot() -> Result<()> {
+    let sh = include_str!("./wait_boot.sh");
+    Command::new("sh").arg("-c").arg(sh).spawn()?.wait()?;
+    Ok(())
 }
 
 fn check_process() {
@@ -108,11 +98,9 @@ fn init() -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    while !wait_boot() {
-        std::thread::sleep(std::time::Duration::from_secs(5));
-    }
-    check_process();
     init()?;
+    wait_boot()?;
+    check_process();
     logger::log_init().context("😂无法初始化日志")?;
     write(
         "/dev/cpuset/background/cgroup.procs",
