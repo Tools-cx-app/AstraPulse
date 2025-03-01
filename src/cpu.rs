@@ -96,9 +96,9 @@ impl Cpu {
                     }
                 }
                 write(max.to_str().unwrap(), max_freq.to_string().as_str())
-                    .context("无法设置cpu{_policy}频率")?;
+                    .context(format!("无法设置cpu{_policy}频率"))?;
                 write(min.to_str().unwrap(), min_freq.to_string().as_str())
-                    .context("无法设置cpu{_policy}频率")?;
+                    .context(format!("无法设置cpu{_policy}频率"))?;
             }
         }
         Ok(())

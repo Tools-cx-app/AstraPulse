@@ -21,15 +21,15 @@ use anyhow::{Context, Result};
 
 pub fn write(path: &str, context: &str) -> Result<()> {
     fs::set_permissions(path, fs::Permissions::from_mode(0o644))
-        .context("😂无法设置{path}的权限")?;
-    fs::write(path, context).context("😂无法写入{path}")?;
+        .context(format!("😂无法设置{path}的权限"))?;
+    fs::write(path, context).context(format!("😂无法写入{path}"))?;
     fs::set_permissions(path, fs::Permissions::from_mode(0o400))
-        .context("😂无法设置{path}的权限")?;
+        .context(format!("😂无法设置{path}的权限"))?;
     Ok(())
 }
 
 pub fn read(path: &str) -> Result<String> {
-    let context = fs::read_to_string(path).context("😂无法读取{path}")?;
+    let context = fs::read_to_string(path).context(format!("😂无法读取{path}"))?;
     Ok(context)
 }
 
@@ -42,10 +42,10 @@ pub fn lock_value(value: &str, path: Vec<&str>) -> Result<()> {
                 .spawn()?
                 .wait()?;
             fs::set_permissions(p, fs::Permissions::from_mode(0o644))
-                .context("😂无法设置{path}的权限")?;
-            fs::write(p, value).context("😂无法写入{path}")?;
+                .context(format!("😂无法设置{p}的权限"))?;
+            fs::write(p, value).context(format!("😂无法写入{p}"))?;
             fs::set_permissions(p, fs::Permissions::from_mode(0o400))
-                .context("😂无法设置{path}的权限")?;
+                .context(format!("😂无法设置{p}的权限"))?;
         }
     }
     Ok(())
