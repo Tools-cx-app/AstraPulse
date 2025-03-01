@@ -19,7 +19,7 @@ mod buffer;
 mod policy;
 mod screen;
 
-use std::{collections::HashMap, thread};
+use std::collections::HashMap;
 
 use anyhow::Result;
 use buffer::Buffer;

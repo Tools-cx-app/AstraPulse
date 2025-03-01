@@ -18,8 +18,8 @@
 use anyhow::Result;
 use libc::cpu_set_t;
 
-use com_tencent_tmgp_pubgmhd::Pubgmhd;
 use com_tencent_jkchess::Jkchess;
+use com_tencent_tmgp_pubgmhd::Pubgmhd;
 
 mod com_tencent_jkchess;
 mod com_tencent_tmgp_pubgmhd;
