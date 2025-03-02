@@ -16,14 +16,12 @@
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
 mod buffer;
-mod policy;
 mod screen;
 
 use std::collections::HashMap;
 
 use anyhow::Result;
 use buffer::Buffer;
-use policy::Policy;
 use screen::Screen;
 use serde::Deserialize;
 
@@ -42,8 +40,8 @@ pub enum Mode {
 struct Last {
     topapp: Option<String>,
 }
+
 pub struct Looper {
-    policy: Policy,
     buffer: Buffer,
     last: Last,
     topapp: TopAppsWatcher,
@@ -54,8 +52,7 @@ pub struct Looper {
 impl Looper {
     pub fn new() -> Self {
         Self {
-            policy: Policy::new(),
-            buffer: Buffer::new(Mode::Balance).unwrap(),
+            buffer: Buffer::new(Mode::Balance, String::new()).unwrap(),
             last: Last { topapp: None },
             topapp: TopAppsWatcher::new(),
             config: Data {
@@ -74,6 +71,7 @@ impl Looper {
         loop {
             self.screen.get_state();
             self.topapp.topapp_dumper();
+            self.buffer.clone().set_topapps(self.topapp.topapps.clone());
             self.change_mode();
             std::thread::sleep(std::time::Duration::from_millis(2));
         }
@@ -85,7 +83,6 @@ impl Looper {
                 && self.topapp.topapps == app
             {
                 self.last.topapp = Some(self.topapp.topapps.clone());
-                let _ = self.policy.try_set(self.topapp.topapps.clone());
                 self.match_mode(mode.clone());
                 if self.last.topapp.clone().unwrap_or_default() == self.topapp.topapps {
                     log::info!("已为{}设置{:?}", self.topapp.topapps, mode);
@@ -108,5 +105,6 @@ impl Looper {
         };
         let _ = buffer.try_set_cpuset();
         let _ = buffer.try_set_cpu();
+        let _ = buffer.try_set_cpu_affinity_scheduler();
     }
 }

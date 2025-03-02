@@ -19,8 +19,9 @@ use serde::Deserialize;
 
 #[derive(Deserialize, Clone)]
 pub struct Deriver {
-    pub name: String,
+    pub pkg: String,
     pub cpuset: Cpuset,
+    pub processes: Processes,
 }
 
 #[derive(Deserialize, Clone)]
@@ -29,4 +30,10 @@ pub struct Cpuset {
     pub background: String,
     pub foreground: String,
     pub system_background: String,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct Processes {
+    pub thread: String,
+    pub cpu: isize,
 }

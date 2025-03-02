@@ -17,9 +17,10 @@
 
 pub mod deriver;
 
-use std::{fs::read_dir, path::Path, process::Command};
+use std::{fs::read_dir, path::Path};
 
-use anyhow::{Context, Ok, Result};
+use anyhow::{Context, Result};
+use libc::cpu_set_t;
 
 use crate::{
     cpu::Cpu,
@@ -33,10 +34,11 @@ use super::Mode;
 pub struct Buffer {
     pub deriver: Vec<Deriver>,
     pub mode: Mode,
+    pub topapps: String,
 }
 
 impl Buffer {
-    pub fn new(mode: Mode) -> Result<Self> {
+    pub fn new(mode: Mode, topapps: String) -> Result<Self> {
         let mut deriver_path = Vec::new();
         let path = Path::new("/data/adb/modules/AstraPulse/config");
         for entry in read_dir(path)? {
@@ -59,6 +61,7 @@ impl Buffer {
         Ok(Self {
             deriver: deriver_struct,
             mode,
+            topapps,
         })
     }
 
@@ -66,11 +69,14 @@ impl Buffer {
         self.mode = mode;
     }
 
+    pub fn set_topapps(mut self, topapps: String) {
+        self.topapps = topapps;
+    }
+
     pub fn try_set_cpu(&self) -> Result<()> {
         let mode = self.mode.clone();
-        for freqs in self.deriver.clone() {
-            let soc = Self::get_soc()?;
-            if soc == freqs.name {
+        for i in self.deriver.clone() {
+            if self.topapps == i.pkg {
                 let mut cpu = Cpu::new();
                 let _ = cpu.get_policy();
                 let _ = match mode {
@@ -84,34 +90,76 @@ impl Buffer {
         Ok(())
     }
 
-    pub fn get_soc() -> Result<String> {
-        let output = Command::new("sh")
-            .arg("-c")
-            .arg("getprop ro.soc.model")
-            .output()
-            .context("无法获取Cpu型号")?;
-        Ok(String::from_utf8_lossy(&output.stdout).to_string())
-    }
-
     pub fn try_set_cpuset(&self) -> Result<()> {
-        for freqs in self.deriver.clone() {
-            let soc = Self::get_soc()?;
-            if soc == freqs.name {
-                write(
-                    "/dev/cpuset/background/cpus",
-                    freqs.cpuset.background.as_str(),
-                )?;
-                write(
-                    "/dev/cpuset/foreground/cpus",
-                    freqs.cpuset.foreground.as_str(),
-                )?;
-                write("/dev/cpuset/top-app/cpus", freqs.cpuset.top_app.as_str())?;
+        for i in self.deriver.clone() {
+            if self.topapps == i.pkg {
+                write("/dev/cpuset/background/cpus", i.cpuset.background.as_str())?;
+                write("/dev/cpuset/foreground/cpus", i.cpuset.foreground.as_str())?;
+                write("/dev/cpuset/top-app/cpus", i.cpuset.top_app.as_str())?;
                 write(
                     "/dev/cpuset/system-background/cpus",
-                    freqs.cpuset.system_background.as_str(),
+                    i.cpuset.system_background.as_str(),
                 )?;
             }
         }
         Ok(())
+    }
+
+    pub fn try_set_cpu_affinity_scheduler(&self) -> Result<()> {
+        for i in self.deriver.clone() {
+            if self.topapps == i.pkg {
+                    let pid = Self::find_pid(i.pkg.as_str())?;
+                    let tid = Self::find_tid(pid, i.processes.thread.as_str())? as libc::pid_t;
+                    unsafe {
+                        let mut set = std::mem::MaybeUninit::<cpu_set_t>::uninit();
+                        let set_ptr = set.as_mut_ptr();
+                        let set_ref = &mut *set_ptr;
+                        libc::CPU_ZERO(set_ref);
+                        libc::CPU_SET(i.processes.cpu as usize, set_ref);
+                        if libc::sched_setaffinity(
+                            tid,
+                            std::mem::size_of::<cpu_set_t>(),
+                            set_ptr as *const _,
+                        ) != 0
+                        {
+                            return Err(std::io::Error::last_os_error().into());
+                        }
+                    }
+            }
+        }
+        Ok(())
+    }
+
+    fn find_pid(package_name: &str) -> Result<u32> {
+        if let Ok(entries) = std::fs::read_dir("/proc") {
+            for entry in entries.flatten() {
+                let pid_str = entry.file_name().into_string().ok().unwrap_or_default();
+                let pid = pid_str.parse::<u32>()?;
+                let cmdline_path = format!("/proc/{}/cmdline", pid);
+                if let Ok(cmdline) = std::fs::read_to_string(cmdline_path) {
+                    if cmdline.trim_matches('\0').contains(package_name) {
+                        return Ok(pid);
+                    }
+                }
+            }
+        }
+        Ok(0)
+    }
+
+    fn find_tid(pid: u32, thread_name: &str) -> Result<u32> {
+        let task_dir = format!("/proc/{}/task", pid);
+        if let Ok(entries) = std::fs::read_dir(task_dir) {
+            for entry in entries.flatten() {
+                let tid_str = entry.file_name().into_string().unwrap_or_default();
+                let tid = tid_str.parse::<u32>()?;
+                let comm_path = format!("/proc/{}/task/{}/comm", pid, tid);
+                if let Ok(comm) = std::fs::read_to_string(comm_path) {
+                    if comm.trim() == thread_name {
+                        return Ok(tid);
+                    }
+                }
+            }
+        }
+        Ok(0)
     }
 }
