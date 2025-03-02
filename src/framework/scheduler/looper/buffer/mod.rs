@@ -109,7 +109,7 @@ impl Buffer {
     pub fn try_set_cpu_affinity_scheduler(&self) -> Result<()> {
         for i in self.deriver.clone() {
             if self.topapps == i.pkg {
-                let pid = Self::find_pid(i.pkg.as_str())?;
+                let pid = super::find_pid(i.pkg.as_str())?;
                 let tid = Self::find_tid(pid, i.processes.thread.as_str())? as libc::pid_t;
                 unsafe {
                     let mut set = std::mem::MaybeUninit::<cpu_set_t>::uninit();
@@ -129,22 +129,6 @@ impl Buffer {
             }
         }
         Ok(())
-    }
-
-    fn find_pid(package_name: &str) -> Result<u32> {
-        if let Ok(entries) = std::fs::read_dir("/proc") {
-            for entry in entries.flatten() {
-                let pid_str = entry.file_name().into_string().ok().unwrap_or_default();
-                let pid = pid_str.parse::<u32>()?;
-                let cmdline_path = format!("/proc/{}/cmdline", pid);
-                if let Ok(cmdline) = std::fs::read_to_string(cmdline_path) {
-                    if cmdline.trim_matches('\0').contains(package_name) {
-                        return Ok(pid);
-                    }
-                }
-            }
-        }
-        Ok(0)
     }
 
     fn find_tid(pid: u32, thread_name: &str) -> Result<u32> {
