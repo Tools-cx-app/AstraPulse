@@ -21,18 +21,19 @@ mod file_hander;
 mod framework;
 mod logger;
 
-use std::{
-    fs,
-    process::{Command, exit},
-};
+use std::{fs, process::exit};
 
 use anyhow::{Context, Result};
 use file_hander::{lock_value, write};
 
-fn wait_boot() -> Result<()> {
-    let sh = include_str!("./wait_boot.sh");
-    Command::new("sh").arg("-c").arg(sh).spawn()?.wait()?;
-    Ok(())
+fn wait_boot() {
+    while android_system_properties::AndroidSystemProperties::new()
+        .get("sys.boot_completed")
+        .unwrap_or_default()
+        .contains("1")
+    {
+        std::thread::sleep(std::time::Duration::from_secs(5));
+    }
 }
 
 fn check_process() {
@@ -94,7 +95,7 @@ fn init() -> Result<()> {
 
 fn main() -> Result<()> {
     init()?;
-    wait_boot()?;
+    wait_boot();
     check_process();
     logger::log_init().context("😂无法初始化日志")?;
     write(
