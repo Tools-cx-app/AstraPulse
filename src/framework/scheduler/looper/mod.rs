@@ -22,6 +22,7 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 use buffer::Buffer;
+use libc::{PRIO_PROCESS, setpriority};
 use screen::Screen;
 use serde::Deserialize;
 
@@ -84,15 +85,46 @@ impl Looper {
             {
                 self.last.topapp = Some(self.topapp.topapps.clone());
                 self.match_mode(mode.clone());
+                let _ = Self::try_init_priority(mode.clone());
                 if self.last.topapp.clone().unwrap_or_default() == self.topapp.topapps {
                     log::info!("已为{}设置{:?}", self.topapp.topapps, mode);
                 }
             } else if self.screen.state {
                 self.match_mode(self.config.rest_screen.clone());
+                let _ = Self::try_init_priority(mode.clone());
             } else {
                 self.match_mode(self.config.default.clone());
+                let _ = Self::try_init_priority(mode.clone());
             }
         }
+    }
+
+    fn try_init_priority(mode: Mode) -> Result<()> {
+        let prio = match mode {
+            Mode::Powersave => 0,
+            Mode::Balance => -5,
+            Mode::Performance => -10,
+            Mode::Fast => -20,
+        };
+        unsafe {
+            setpriority(PRIO_PROCESS, find_pid("/system/bin/surfaceflinger")?, prio);
+            setpriority(
+                PRIO_PROCESS,
+                find_pid("com.google.android.apps.nexuslauncher")?,
+                prio,
+            );
+            setpriority(PRIO_PROCESS, find_pid("com.android.launcher3")?, prio);
+            setpriority(
+                PRIO_PROCESS,
+                find_pid("com.sec.android.app.launcher")?,
+                prio,
+            );
+            setpriority(PRIO_PROCESS, find_pid("com.oppo.launcher")?, prio);
+            setpriority(PRIO_PROCESS, find_pid("com.vivo.launcher")?, prio);
+            setpriority(PRIO_PROCESS, find_pid("com.huawei.android.launcher")?, prio);
+            setpriority(PRIO_PROCESS, find_pid("com.miui.home")?, prio);
+        }
+        Ok(())
     }
 
     fn match_mode(&mut self, mode: Mode) {
