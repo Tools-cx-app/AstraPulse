@@ -17,6 +17,7 @@
 
 mod buffer;
 mod screen;
+mod sf;
 
 use std::collections::HashMap;
 
@@ -25,6 +26,7 @@ use buffer::Buffer;
 use libc::{PRIO_PROCESS, setpriority};
 use screen::Screen;
 use serde::Deserialize;
+use sf::Sf;
 
 use crate::{file_hander::read, framework::config::Data};
 
@@ -48,6 +50,7 @@ pub struct Looper {
     topapp: TopAppsWatcher,
     config: Data,
     screen: Screen,
+    sf: Sf,
 }
 
 impl Looper {
@@ -62,6 +65,7 @@ impl Looper {
                 app: HashMap::new(),
             },
             screen: Screen::new(),
+            sf: Sf::new(),
         }
     }
 
@@ -69,10 +73,12 @@ impl Looper {
         let context = read("/data/adb/modules/AstraPulse/config.toml")?;
         let context: Data = toml::from_str(context.as_str())?;
         self.config = context;
+        self.sf.try_run()?;
         loop {
             self.screen.get_state();
             self.topapp.topapp_dumper();
             self.buffer.clone().set_topapps(self.topapp.topapps.clone());
+            self.sf.set_topapps(self.topapp.topapps.clone());
             self.change_mode();
             std::thread::sleep(std::time::Duration::from_millis(2));
         }
