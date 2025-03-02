@@ -65,18 +65,6 @@ fn init() -> Result<()> {
             "/sys/module/perfmgr_policy/parameters/perfmgr_enable",
             "/sys/module/perfmgr_mtk/parameters/perfmgr_enable",
             "/sys/module/migt/parameters/glk_fbreak_enable",
-        ],
-    )?;
-    lock_value(
-        "1",
-        vec![
-            "/sys/module/migt/parameters/glk_disable",
-            "/proc/game_opt/disable_cpufreq_limit",
-        ],
-    )?;
-    lock_value(
-        "0",
-        vec![
             "/odm/bin/hw/vendor.oplus.hardware.urcc-service",
             "/vendor/libvendor.oplus.hardware.urcc-V1-ndk.so",
             "/dev/__properties__/u:object_r:vendor_oplus_urcc_prop:s0",
@@ -89,6 +77,16 @@ fn init() -> Result<()> {
             "/odm/etc/orms/orms_core_config.xml",
             "/data/data/com.xiaomi.joyose/databases/SmartP.db",
             "/data/data/com.xiaomi.joyose/databases/teg_config.db",
+            "/sys/kernel/fpsgo/fbt/switch_idleprefer",
+            "/sys/module/mtk_fpsgo/parameters/boost_affinity",
+            "/sys/kernel/fpsgo/minitop/enable",
+        ],
+    )?;
+    lock_value(
+        "1",
+        vec![
+            "/sys/module/migt/parameters/glk_disable",
+            "/proc/game_opt/disable_cpufreq_limit",
         ],
     )?;
     Ok(())
