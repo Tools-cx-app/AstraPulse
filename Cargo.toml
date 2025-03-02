@@ -26,6 +26,7 @@ description = "专为萌新做的调度"
 authors = ["[rust@localhost]"]
 
 [dependencies]
+android_system_properties = "0.1.5"
 anyhow = "1.0.95"
 chrono = "0.4.39"
 dumpsys-rs = { git = "https://github.com/shadow3aaa/dumpsys-rs" }
