@@ -79,6 +79,7 @@ impl Buffer {
             if self.topapps == i.pkg {
                 let mut cpu = Cpu::new();
                 let _ = cpu.get_policy();
+                let _ = cpu.set_governors();
                 let _ = match mode {
                     Mode::Powersave => cpu.set_freqs(mode.clone()),
                     Mode::Balance => cpu.set_freqs(mode.clone()),
@@ -108,23 +109,23 @@ impl Buffer {
     pub fn try_set_cpu_affinity_scheduler(&self) -> Result<()> {
         for i in self.deriver.clone() {
             if self.topapps == i.pkg {
-                    let pid = Self::find_pid(i.pkg.as_str())?;
-                    let tid = Self::find_tid(pid, i.processes.thread.as_str())? as libc::pid_t;
-                    unsafe {
-                        let mut set = std::mem::MaybeUninit::<cpu_set_t>::uninit();
-                        let set_ptr = set.as_mut_ptr();
-                        let set_ref = &mut *set_ptr;
-                        libc::CPU_ZERO(set_ref);
-                        libc::CPU_SET(i.processes.cpu as usize, set_ref);
-                        if libc::sched_setaffinity(
-                            tid,
-                            std::mem::size_of::<cpu_set_t>(),
-                            set_ptr as *const _,
-                        ) != 0
-                        {
-                            return Err(std::io::Error::last_os_error().into());
-                        }
+                let pid = Self::find_pid(i.pkg.as_str())?;
+                let tid = Self::find_tid(pid, i.processes.thread.as_str())? as libc::pid_t;
+                unsafe {
+                    let mut set = std::mem::MaybeUninit::<cpu_set_t>::uninit();
+                    let set_ptr = set.as_mut_ptr();
+                    let set_ref = &mut *set_ptr;
+                    libc::CPU_ZERO(set_ref);
+                    libc::CPU_SET(i.processes.cpu as usize, set_ref);
+                    if libc::sched_setaffinity(
+                        tid,
+                        std::mem::size_of::<cpu_set_t>(),
+                        set_ptr as *const _,
+                    ) != 0
+                    {
+                        return Err(std::io::Error::last_os_error().into());
                     }
+                }
             }
         }
         Ok(())

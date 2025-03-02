@@ -103,4 +103,23 @@ impl Cpu {
         }
         Ok(())
     }
+
+    pub fn set_governors(&self) -> Result<()> {
+        for _policy in self.policy.clone() {
+            for path in self.path.clone() {
+                let governors = path.join("scaling_available_governors");
+                let context = {
+                    let governors_context = read(path.to_str().unwrap())?;
+                    if governors_context.contains("walt") {
+                        "walt"
+                    } else {
+                        "schedutil"
+                    }
+                };
+                write(governors.to_str().unwrap(), context)
+                    .context(format!("无法设置cpu{_policy}调速器"))?;
+            }
+        }
+        Ok(())
+    }
 }
