@@ -69,7 +69,7 @@ impl Buffer {
         self.mode = mode;
     }
 
-    pub fn set_topapps(mut self, topapps: String) {
+    pub fn set_topapps(&mut self, topapps: String) {
         self.topapps = topapps;
     }
 
