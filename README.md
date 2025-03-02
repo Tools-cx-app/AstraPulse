@@ -4,6 +4,8 @@
 ## 配置文件选项
 - ### **rest_screen**
 - [Mode](#Mode类型)
+ ### **default**
+- [Mode](#Mode类型)
 ## Mode类型
 - ### `Powersave`
 省电模式，限制cpu频率，和后台应用
