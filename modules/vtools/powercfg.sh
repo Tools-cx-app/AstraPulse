@@ -16,8 +16,11 @@
 #  You should have received a copy of the GNU General Public License along
 #  with AstraPulse. If not, see <https:://www.gnu.org/licenses/>.
 
-MODDIR=${0%/*}
+mode=/data/adb/modules/AstraPulse/mode
 
-sh $MODDIR/vtools/init_vtools.sh $(realpath $MODDIR/module.prop)
-
-$MODDIR/AstraPulse > $MODDIR/run.log
+case "$1" in
+"init" | "fast" | "pedestal") echo fast >$mode ;;
+"powersave" | "standby") echo powersave >$mode ;;
+"balance") echo balance >$mode ;;
+"performance") echo performance >$mode ;;
+esac

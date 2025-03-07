@@ -16,8 +16,10 @@
 #  You should have received a copy of the GNU General Public License along
 #  with AstraPulse. If not, see <https:://www.gnu.org/licenses/>.
 
-MODDIR=${0%/*}
+BASEDIR="$(dirname $(readlink -f "$0"))"
 
-sh $MODDIR/vtools/init_vtools.sh $(realpath $MODDIR/module.prop)
+source $BASEDIR/gen_json.sh $1
+echo "$json" >/data/powercfg.json
 
-$MODDIR/AstraPulse > $MODDIR/run.log
+cp -af $BASEDIR/powercfg.sh /data/powercfg.sh
+chmod 755 /data/powercfg.sh

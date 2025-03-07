@@ -16,8 +16,25 @@
 #  You should have received a copy of the GNU General Public License along
 #  with AstraPulse. If not, see <https:://www.gnu.org/licenses/>.
 
-MODDIR=${0%/*}
+propPath=$1
+version=$(cat $propPath | grep "version=" | cut -d "=" -f2)
+versionCode=$(cat $propPath | grep "versionCode=" | cut -d "=" -f2)
 
-sh $MODDIR/vtools/init_vtools.sh $(realpath $MODDIR/module.prop)
-
-$MODDIR/AstraPulse > $MODDIR/run.log
+json=$(
+	cat <<EOF
+{
+    "name": "AstraPulse",
+    "author": "ruu",
+    "version": "$version",
+    "versionCode": ${versionCode},
+    "features": {
+        "strict": true,
+        "pedestal": true
+    },
+    "module": "AstraPulse",
+    "state": "/data/adb/modules/AstraPulse/mode",
+    "entry": "/data/powercfg.sh",
+    "projectUrl": "https://github.com/Tools-cx-app/AstraPulse"
+}
+EOF
+)

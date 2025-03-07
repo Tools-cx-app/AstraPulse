@@ -1,4 +1,19 @@
-# 注意 这不是占位符！！这个代码的作用是将模块里的东西全部塞系统里，然后挂上默认权限
+#  Copyright 2023-2025, [rust@localhost] $ (@3532340532)
+# 
+#  This file is part of AstraPulse.
+# 
+#  AstraPulse is free software: you can redistribute it and/or modify it under
+#  the terms of the GNU General Public License as published by the Free
+#  Software Foundation, either version 3 of the License, or (at your option)
+#  any later version.
+# 
+#  AstraPulse is distributed in the hope that it will be useful, but WITHOUT ANY
+#  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#  details.
+# 
+#  You should have received a copy of the GNU General Public License along
+#  with AstraPulse. If not, see <https:://www.gnu.org/licenses/>.
 
 ui_print "专为萌新做的调度"
 ui_print "配置文件在/data/adb/modules/AstraPulse/config.toml"
