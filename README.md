@@ -6,7 +6,7 @@
   - **`"package"` = `Mode`**
 
       - `package`: 字符串，应用包名
-          - `Mode`: Mode类型(#Mode类型)
+          - `Mode`: [Mode类型](#Mode类型)
 ## Mode类型
 - ### `Powersave`
 省电模式，限制cpu频率，和后台应用
