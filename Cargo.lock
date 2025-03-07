@@ -9,7 +9,6 @@ dependencies = [
  "android_system_properties",
  "anyhow",
  "chrono",
- "ctrlc",
  "dumpsys-rs",
  "flexi_logger",
  "frame-analyzer",

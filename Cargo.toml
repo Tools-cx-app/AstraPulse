@@ -29,7 +29,6 @@ authors = ["[rust@localhost]"]
 android_system_properties = "0.1.5"
 anyhow = "1.0.95"
 chrono = "0.4.39"
-ctrlc = "3.4.5"
 dumpsys-rs = { git = "https://github.com/shadow3aaa/dumpsys-rs" }
 flexi_logger = "0.29.8"
 frame-analyzer = "0.3.3"
