@@ -88,7 +88,6 @@ impl Looper {
     pub fn enter_looper(&mut self) -> Result<()> {
         let context = read("/data/adb/modules/AstraPulse/config.toml")?;
         let context: Data = toml::from_str(context.as_str())?;
-        let default_mode = read("/data/adb/modules/AstraPulse/mode")?;
         self.chang_default()?;
         self.config = context;
         self.sf.try_run()?;
