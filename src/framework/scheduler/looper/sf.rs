@@ -50,12 +50,6 @@ impl Sf {
         let mut analyzer = Analyzer::new()?;
         analyzer.attach_app(find_pid(self.topapps.as_str())? as i32)?;
         let running = Arc::new(AtomicBool::new(true));
-        {
-            let running = running.clone();
-            ctrlc::set_handler(move || {
-                running.store(false, Ordering::Release);
-            })?;
-        }
         let mut buffer = VecDeque::with_capacity(120);
         thread::spawn(move || {
             while running.load(Ordering::Acquire) {
