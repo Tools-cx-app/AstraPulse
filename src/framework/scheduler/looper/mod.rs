@@ -16,7 +16,6 @@
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
 mod buffer;
-mod screen;
 mod sf;
 
 use std::collections::HashMap;
@@ -24,7 +23,6 @@ use std::collections::HashMap;
 use anyhow::Result;
 use buffer::Buffer;
 use libc::{PRIO_PROCESS, setpriority};
-use screen::Screen;
 use serde::Deserialize;
 use sf::Sf;
 
@@ -49,8 +47,8 @@ pub struct Looper {
     last: Last,
     topapp: TopAppsWatcher,
     config: Data,
-    screen: Screen,
     sf: Sf,
+    default: Mode,
 }
 
 impl Looper {
@@ -60,22 +58,41 @@ impl Looper {
             last: Last { topapp: None },
             topapp: TopAppsWatcher::new(),
             config: Data {
-                default: Mode::Balance,
-                rest_screen: Mode::Powersave,
                 app: HashMap::new(),
             },
-            screen: Screen::new(),
             sf: Sf::new(),
+            default: Mode::Balance,
         }
+    }
+
+    fn chang_default(&mut self) -> Result<()> {
+        let context = read("/data/adb/modules/AstraPulse/mode")?;
+        let mode = vec!["powersave", "balance", "performance", "fast"];
+        for i in mode {
+            if context.contains(i) {
+                match context.as_str() {
+                    "powersave" => self.default = Mode::Powersave,
+                    "balance" => self.default = Mode::Balance,
+                    "performance" => self.default = Mode::Performance,
+                    "fast" => self.default = Mode::Fast,
+                    _ => {
+                        log::error!("/data/adb/modules/AstraPulse/mode 文件异常，使用默认配置");
+                        self.default = Mode::Balance;
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 
     pub fn enter_looper(&mut self) -> Result<()> {
         let context = read("/data/adb/modules/AstraPulse/config.toml")?;
         let context: Data = toml::from_str(context.as_str())?;
+        let default_mode = read("/data/adb/modules/AstraPulse/mode")?;
+        self.chang_default()?;
         self.config = context;
         self.sf.try_run()?;
         loop {
-            self.screen.get_state();
             self.topapp.topapp_dumper();
             self.buffer.clone().set_topapps(self.topapp.topapps.clone());
             self.sf.set_topapps(self.topapp.topapps.clone());
@@ -95,11 +112,8 @@ impl Looper {
                 if self.last.topapp.clone().unwrap_or_default() == self.topapp.topapps {
                     log::info!("已为{}设置{:?}", self.topapp.topapps, mode);
                 }
-            } else if self.screen.state {
-                self.match_mode(self.config.rest_screen.clone());
-                let _ = Self::try_init_priority(mode.clone());
             } else {
-                self.match_mode(self.config.default.clone());
+                self.match_mode(self.default.clone());
                 let _ = Self::try_init_priority(mode.clone());
             }
         }

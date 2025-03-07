@@ -29,7 +29,7 @@ use frame_analyzer::Analyzer;
 
 use crate::cpu::Cpu;
 
-use super::{find_pid, Mode};
+use super::{Mode, find_pid};
 
 pub struct Sf {
     topapps: String,
@@ -37,7 +37,9 @@ pub struct Sf {
 
 impl Sf {
     pub fn new() -> Self {
-        Self { topapps : String::new() }
+        Self {
+            topapps: String::new(),
+        }
     }
 
     pub fn set_topapps(&mut self, topapps: String) {

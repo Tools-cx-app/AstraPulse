@@ -23,7 +23,5 @@ use crate::framework::scheduler::looper::Mode;
 
 #[derive(Deserialize, Clone)]
 pub struct Data {
-    pub default: Mode,
-    pub rest_screen: Mode,
     pub app: HashMap<String, Mode>,
 }

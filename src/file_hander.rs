@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License along
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
-use std::{ffi::CString, fs, os::unix::fs::PermissionsExt, process::Command};
+use std::{ffi::CString, fs, os::unix::fs::PermissionsExt};
 
 use anyhow::{Context, Result};
 use libc::umount;
@@ -51,4 +51,3 @@ pub fn lock_value(value: &str, path: Vec<&str>) -> Result<()> {
     }
     Ok(())
 }
-
