@@ -16,7 +16,7 @@
 # with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
 [workspace]
-members = [ "cli","task"]
+members = [ "task"]
 
 [package]
 name = "AstraPulse"
