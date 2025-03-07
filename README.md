@@ -1,11 +1,12 @@
 # **ASP**
 ## 简介
 - 一个简单到不能再简单的调度，可自定义性高
-## 配置文件选项
-- ### **rest_screen**
-- [Mode](#Mode类型)
- ### **default**
-- [Mode](#Mode类型)
+## 主文件选项
+- ### `app`
+  - **`"package"` = `Mode`**
+
+      - `package`: 字符串，应用包名
+          - `Mode`: Mode类型(#Mode类型)
 ## Mode类型
 - ### `Powersave`
 省电模式，限制cpu频率，和后台应用
