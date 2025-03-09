@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU General Public License along
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
+mod boost;
 mod buffer;
-mod sf;
 
 use std::collections::HashMap;
 
 use anyhow::Result;
+use boost::Boost;
 use buffer::Buffer;
 use libc::{PRIO_PROCESS, setpriority};
 use serde::Deserialize;
-use sf::Sf;
 
 use crate::{file_hander::read, framework::config::Data};
 
@@ -47,7 +47,7 @@ pub struct Looper {
     last: Last,
     topapp: TopAppsWatcher,
     config: Data,
-    sf: Sf,
+    boost: Boost,
     default: Mode,
 }
 
@@ -60,7 +60,7 @@ impl Looper {
             config: Data {
                 app: HashMap::new(),
             },
-            sf: Sf::new(),
+            boost: Boost::new(),
             default: Mode::Balance,
         }
     }
@@ -90,11 +90,11 @@ impl Looper {
         let context: Data = toml::from_str(context.as_str())?;
         self.chang_default()?;
         self.config = context;
-        self.sf.try_run()?;
+        self.boost.try_run()?;
         loop {
             self.topapp.topapp_dumper();
             self.buffer.clone().set_topapps(self.topapp.topapps.clone());
-            self.sf.set_topapps(self.topapp.topapps.clone());
+            self.boost.set_topapps(self.topapp.topapps.clone());
             self.change_mode();
             std::thread::sleep(std::time::Duration::from_millis(2));
         }

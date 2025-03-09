@@ -31,11 +31,11 @@ use crate::cpu::Cpu;
 
 use super::{Mode, find_pid};
 
-pub struct Sf {
+pub struct Boost {
     topapps: String,
 }
 
-impl Sf {
+impl Boost {
     pub fn new() -> Self {
         Self {
             topapps: String::new(),
@@ -58,7 +58,7 @@ impl Sf {
                         buffer.pop_back();
                     }
                     buffer.push_front(frametime);
-                    if buffer.len() > 30 {
+                    if buffer.len() > 15 {
                         let mut cpu = Cpu::new();
                         let _ = cpu.get_policy();
                         let _ = cpu.set_freqs(Mode::Fast);
