@@ -157,7 +157,6 @@ impl Looper {
         let _ = buffer.try_set_cpu();
         let _ = buffer.try_set_cpu_affinity_scheduler();
         let _ = buffer.try_set_touch();
-        let _ = Self::try_init_priority(mode.clone());
     }
 }
 

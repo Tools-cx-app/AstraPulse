@@ -20,7 +20,6 @@ pub mod deriver;
 use std::{fs::read_dir, io::Write, path::Path, process::Command};
 
 use anyhow::{Context, Result};
-use libc::cpu_set_t;
 use tempfile::NamedTempFile;
 
 use crate::{
