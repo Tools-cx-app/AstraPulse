@@ -20,7 +20,7 @@ members = [ "task"]
 
 [package]
 name = "AstraPulse"
-version = "1.3.0"
+version = "1.4.0"
 edition = "2024"
 description = "专为萌新做的调度"
 authors = ["[rust@localhost]"]
@@ -37,6 +37,7 @@ log = "0.4.25"
 once_cell = "1.20.3"
 regex = "1.11.1"
 serde = { version = "1.0.217", features = ["derive"] }
+tempfile = "3.18.0"
 toml = "0.8.20"
 
 [build-dependencies]
