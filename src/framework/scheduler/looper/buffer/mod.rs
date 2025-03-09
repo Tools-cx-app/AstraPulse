@@ -17,10 +17,11 @@
 
 pub mod deriver;
 
-use std::{fs::read_dir, path::Path};
+use std::{fs::read_dir, io::Write, os::fd::AsFd, path::Path, process::Command};
 
 use anyhow::{Context, Result};
 use libc::cpu_set_t;
+use tempfile::{NamedTempFile, tempdir, tempfile};
 
 use crate::{
     cpu::Cpu,
@@ -88,6 +89,24 @@ impl Buffer {
                 };
             }
         }
+        Ok(())
+    }
+
+    pub fn try_set_touch(&self) -> Result<()> {
+        let balance = include_str!("./balance.prop");
+        let performance = include_str!("./performance.prop");
+        let mut temp = NamedTempFile::new()?;
+        match self.mode {
+            Mode::Balance | Mode::Powersave => temp.write_all(balance.as_bytes()),
+            Mode::Fast | Mode::Performance => temp.write_all(performance.as_bytes()),
+        }?;
+        Command::new("sh")
+            .arg("-c")
+            .arg("resetprop")
+            .arg("-f")
+            .arg(temp.path().to_str().unwrap())
+            .spawn()?
+            .wait()?;
         Ok(())
     }
 

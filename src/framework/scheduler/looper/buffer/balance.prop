@@ -1,0 +1,68 @@
+#  Copyright 2023-2025, [rust@localhost] $ (@3532340532)
+# 
+#  This file is part of AstraPulse.
+# 
+#  AstraPulse is free software: you can redistribute it and/or modify it under
+#  the terms of the GNU General Public License as published by the Free
+#  Software Foundation, either version 3 of the License, or (at your option)
+#  any later version.
+# 
+#  AstraPulse is distributed in the hope that it will be useful, but WITHOUT ANY
+#  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+#  details.
+# 
+#  You should have received a copy of the GNU General Public License along
+#  with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
+
+debug.performance.tuning=1
+
+#基本参数
+touch.deviceType=touchScreen
+touch.gestureMode=pointer
+touch.size.scale=1.0
+touch.size.bias=0.0
+touch.size.isSummed=0
+touch.pressure.scale=0.001
+touch.pressure.calibration=physical
+touch.orientationAware=1
+touch.orientation.calibration=default
+touch.distance.calibration=scaled
+touch.distance.scale=1
+DragMinSwitchSpeed=99999.0px/s
+QuietInterval=0.0ms
+MultitouchSettleInterval=0.0ms
+MultitouchMinDistance=0.0px
+TapInterval=0.0ms
+TapDragInterval=0.0ms
+TapSlop=99999.0px
+#forget_the_heart
+
+#优化参数
+windowsmgr.max_events_per_sec=999
+view.scroll_friction=0.0001
+#触控
+ro.min_pointer_dur=0.000000000000000000000000000000000000000000000000000000000000000000001
+#多点
+view.touch_slop=5
+view.minimum_fling_velocity=30000
+view.maximum_fling_velocity=30000
+ro.max.fling_velocity=30000
+ro.min.fling_velocity=30000
+ro.product.multi_touch_enabled=true
+ro.product.max_num_touch=10
+
+#硬件优化
+debug.egl.hw=1
+video.accelerate.hw=1
+
+
+#通话屏幕亮屏灵敏度
+mot.proximity.delay=250
+
+
+mot.proximity.distance=1
+
+
+persist.sys.ui.hw=1
+mot.proximity.distance=1

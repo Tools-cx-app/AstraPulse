@@ -95,6 +95,7 @@ impl Looper {
             self.topapp.topapp_dumper();
             self.buffer.clone().set_topapps(self.topapp.topapps.clone());
             self.boost.set_topapps(self.topapp.topapps.clone());
+            self.buffer.try_set_touch()?;
             self.change_mode();
             std::thread::sleep(std::time::Duration::from_millis(2));
         }
@@ -157,6 +158,7 @@ impl Looper {
         let _ = buffer.try_set_cpuset();
         let _ = buffer.try_set_cpu();
         let _ = buffer.try_set_cpu_affinity_scheduler();
+        let _ = buffer.try_set_touch();
     }
 }
 
