@@ -124,46 +124,4 @@ impl Buffer {
         }
         Ok(())
     }
-
-    pub fn try_set_cpu_affinity_scheduler(&self) -> Result<()> {
-        for i in self.deriver.clone() {
-            if self.topapps == i.pkg {
-                let pid = super::find_pid(i.pkg.as_str())?;
-                let tid = Self::find_tid(pid, i.processes.thread.as_str())? as libc::pid_t;
-                unsafe {
-                    let mut set = std::mem::MaybeUninit::<cpu_set_t>::uninit();
-                    let set_ptr = set.as_mut_ptr();
-                    let set_ref = &mut *set_ptr;
-                    libc::CPU_ZERO(set_ref);
-                    libc::CPU_SET(i.processes.cpu as usize, set_ref);
-                    if libc::sched_setaffinity(
-                        tid,
-                        std::mem::size_of::<cpu_set_t>(),
-                        set_ptr as *const _,
-                    ) != 0
-                    {
-                        return Err(std::io::Error::last_os_error().into());
-                    }
-                }
-            }
-        }
-        Ok(())
-    }
-
-    fn find_tid(pid: u32, thread_name: &str) -> Result<u32> {
-        let task_dir = format!("/proc/{}/task", pid);
-        if let Ok(entries) = std::fs::read_dir(task_dir) {
-            for entry in entries.flatten() {
-                let tid_str = entry.file_name().into_string().unwrap_or_default();
-                let tid = tid_str.parse::<u32>()?;
-                let comm_path = format!("/proc/{}/task/{}/comm", pid, tid);
-                if let Ok(comm) = std::fs::read_to_string(comm_path) {
-                    if comm.trim() == thread_name {
-                        return Ok(tid);
-                    }
-                }
-            }
-        }
-        Ok(0)
-    }
 }
