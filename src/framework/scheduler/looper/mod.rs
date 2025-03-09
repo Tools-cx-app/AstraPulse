@@ -108,13 +108,11 @@ impl Looper {
             {
                 self.last.topapp = Some(self.topapp.topapps.clone());
                 self.match_mode(mode.clone());
-                let _ = Self::try_init_priority(mode.clone());
                 if self.last.topapp.clone().unwrap_or_default() == self.topapp.topapps {
                     log::info!("已为{}设置{:?}", self.topapp.topapps, mode);
                 }
             } else {
                 self.match_mode(self.default.clone());
-                let _ = Self::try_init_priority(mode.clone());
             }
         }
     }
@@ -159,6 +157,7 @@ impl Looper {
         let _ = buffer.try_set_cpu();
         let _ = buffer.try_set_cpu_affinity_scheduler();
         let _ = buffer.try_set_touch();
+        let _ = Self::try_init_priority(mode.clone());
     }
 }
 
