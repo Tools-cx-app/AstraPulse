@@ -20,4 +20,4 @@ MODDIR=${0%/*}
 
 sh $MODDIR/vtools/init_vtools.sh $(realpath $MODDIR/module.prop)
 
-$MODDIR/AstraPulse > $MODDIR/run.log
+nohup $MODDIR/AstraPulse > $MODDIR/run.log
