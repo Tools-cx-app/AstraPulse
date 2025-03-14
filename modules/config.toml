@@ -17,3 +17,6 @@
 
 [app]
 "bin.mt.plus" = "Powersave"
+
+[runtime]
+"cpu" = 6
