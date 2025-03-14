@@ -19,4 +19,4 @@
 "bin.mt.plus" = "Powersave"
 
 [runtime]
-"cpu" = 6
+cpu = 6
