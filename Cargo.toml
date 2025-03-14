@@ -20,7 +20,7 @@ members = [ "task"]
 
 [package]
 name = "AstraPulse"
-version = "1.4.0"
+version = "1.5.0"
 edition = "2024"
 description = "专为萌新做的调度"
 authors = ["[rust@localhost]"]
