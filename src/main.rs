@@ -24,7 +24,8 @@ mod logger;
 use std::{fs, process::exit};
 
 use anyhow::{Context, Result};
-use file_hander::{lock_value, write};
+use file_hander::lock_value;
+use framework::scheduler::Scheduler;
 
 fn wait_boot() {
     while android_system_properties::AndroidSystemProperties::new()
@@ -86,12 +87,6 @@ fn main() -> Result<()> {
     wait_boot();
     check_process();
     logger::log_init().context("😂无法初始化日志")?;
-    write(
-        "/dev/cpuset/background/cgroup.procs",
-        std::process::id().to_string().as_str(),
-    )?;
-    framework::scheduler::looper::Looper::new()
-        .enter_looper()
-        .context("😂无法启动")?;
+    Scheduler::new()?.start_scheduler()?;
     Ok(())
 }

@@ -18,8 +18,6 @@
 mod boost;
 mod buffer;
 
-use std::collections::HashMap;
-
 use anyhow::Result;
 use boost::Boost;
 use buffer::Buffer;
@@ -52,14 +50,12 @@ pub struct Looper {
 }
 
 impl Looper {
-    pub fn new() -> Self {
+    pub fn new(config: Data) -> Self {
         Self {
             buffer: Buffer::new(Mode::Balance, String::new()).unwrap(),
             last: Last { topapp: None },
             topapp: TopAppsWatcher::new(),
-            config: Data {
-                app: HashMap::new(),
-            },
+            config,
             boost: Boost::new(),
             default: Mode::Balance,
         }
@@ -86,10 +82,7 @@ impl Looper {
     }
 
     pub fn enter_looper(&mut self) -> Result<()> {
-        let context = read("/data/adb/modules/AstraPulse/config.toml")?;
-        let context: Data = toml::from_str(context.as_str())?;
         self.chang_default()?;
-        self.config = context;
         self.boost.try_run()?;
         loop {
             self.topapp.topapp_dumper();
@@ -155,8 +148,8 @@ impl Looper {
         };
         let _ = buffer.try_set_cpuset();
         let _ = buffer.try_set_cpu();
-        let _ = buffer.try_set_cpu_affinity_scheduler();
         let _ = buffer.try_set_touch();
+        let _ = Self::try_init_priority(mode.clone());
     }
 }
 

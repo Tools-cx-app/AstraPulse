@@ -17,4 +17,51 @@
 
 pub mod looper;
 pub mod topapp;
+
+use std::{mem, process};
+
+use anyhow::Result;
+use libc::{self, CPU_SET, CPU_ZERO, cpu_set_t, sched_setaffinity};
+
+use super::config::Data;
+use crate::file_hander::{read, write};
 pub use topapp::TopAppsWatcher;
+
+pub struct Scheduler {
+    config: Data,
+}
+
+impl Scheduler {
+    pub fn new() -> Result<Self> {
+        let context = read("/data/adb/modules/AstraPulse/config.toml")?;
+        let context: Data = toml::from_str(context.as_str())?;
+        Ok(Self { config: context })
+    }
+
+    pub fn start_scheduler(&self) -> Result<()> {
+        looper::Looper::new(self.config.clone()).enter_looper()?;
+        self.set_cpu()?;
+        Ok(())
+    }
+
+    fn set_cpu(&self) -> Result<()> {
+        write(
+            "/dev/cpuset//cgroup.procs",
+            std::process::id().to_string().as_str(),
+        )?;
+        unsafe {
+            let mut set: cpu_set_t = mem::zeroed();
+            CPU_ZERO(&mut set);
+            CPU_SET(self.config.runtime.cpu, &mut set);
+            let result = sched_setaffinity(
+                process::id() as i32,
+                mem::size_of::<cpu_set_t>(),
+                &set as *const cpu_set_t,
+            );
+            if result != 0 {
+                log::error!("无法绑定到CPU{}", self.config.runtime.cpu);
+            }
+        }
+        Ok(())
+    }
+}

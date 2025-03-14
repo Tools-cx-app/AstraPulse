@@ -24,4 +24,10 @@ use crate::framework::scheduler::looper::Mode;
 #[derive(Deserialize, Clone)]
 pub struct Data {
     pub app: HashMap<String, Mode>,
+    pub runtime: Runtime,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct Runtime {
+    pub cpu: usize,
 }
