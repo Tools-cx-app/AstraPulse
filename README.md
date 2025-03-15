@@ -12,7 +12,12 @@
 
     - `package`: 字符串，应用包名
       - `Mode`: [Mode类型](#Mode类型)
+- ### `runtime`
 
+  - `cpu` = `policy`
+
+    - `cpu`: 不可变
+      - `policy`: usize类型，必须为0-7
 ## config/里文件选项
 
 - ### `pkg`
@@ -40,7 +45,7 @@
 - ### `Performance`
   游戏模式，性能全开
 - ### `Fast`
-  目前和Performance一样
+  比[Performance](#Performance)还激进
 
 ## 联系方式
 
