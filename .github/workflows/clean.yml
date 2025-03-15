@@ -27,8 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete all artifacts
-        uses: geekyeggo/delete-artifact@v1
+        uses: actions/delete-artifact@v4
         with:
-          name: '*'              # 删除所有Artifacts
-          workflow_name: '*.yml' # 指定工作流程名称（或通配符）
-          token: ${{ secrets.GITHUB_TOKEN }}
+          name: '*'  # 删除所有 Artifacts
