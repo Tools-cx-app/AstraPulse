@@ -19,14 +19,16 @@ name: Cleanup Artifacts
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 每天UTC时间0点运行
-  workflow_dispatch:     # 支持手动触发
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   cleanup:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Delete all artifacts
-        uses: actions/delete-artifact@v4
+        uses: geekyeggo/delete-artifact@v2
         with:
-          name: '*'  # 删除所有 Artifacts
+          name: '*'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          retention_days: 7
