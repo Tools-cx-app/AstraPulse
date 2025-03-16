@@ -24,7 +24,7 @@ use std::{
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use fs_extra::{dir, file};
-use zip::{write::FileOptions, CompressionMethod};
+use zip::{CompressionMethod, write::FileOptions};
 use zip_extensions::zip_create_from_directory_with_options;
 
 #[derive(Parser)]
@@ -88,11 +88,7 @@ fn build(release: bool, verbose: bool) -> Result<()> {
     fs::create_dir_all(&temp_dir)?;
 
     let mut cargo = cargo_ndk();
-    cargo.args([
-        "build",
-        "--target",
-        "aarch64-linux-android",
-    ]);
+    cargo.args(["build", "--target", "aarch64-linux-android"]);
 
     if release {
         cargo.arg("--release");
@@ -140,11 +136,7 @@ fn build(release: bool, verbose: bool) -> Result<()> {
 
 fn check(release: bool, verbose: bool) -> Result<()> {
     let mut cargo = cargo_ndk();
-    cargo.args([
-        "check",
-        "--target",
-        "aarch64-linux-android",
-    ]);
+    cargo.args(["check", "--target", "aarch64-linux-android"]);
     cargo.env("RUSTFLAGS", "-C default-linker-libraries");
 
     if release {
