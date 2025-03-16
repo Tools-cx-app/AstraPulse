@@ -118,6 +118,12 @@ fn build(release: bool, verbose: bool) -> Result<()> {
         &file::CopyOptions::new().overwrite(true),
     )
     .unwrap();
+    file::copy(
+        "README.md",
+        temp_dir.join("README.md"),
+        &file::CopyOptions::new().overwrite(true),
+    )
+    .unwrap();
 
     let build_type = if release { "release" } else { "debug" };
     let package_path = Path::new("output").join(format!("AstraPulse-({build_type}).zip"));
