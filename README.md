@@ -46,6 +46,11 @@
 - `cpu` = `usize`
 - `usize`: usize 类型，为线程需要绑定的 cpu
 
+- ### `fps`
+
+- `fps` = `i32`
+- `i32`: 为游戏帧率(feas 使用)
+
 # 配置文件示例
 
 ## config.toml
@@ -76,6 +81,8 @@ cpu = 4
 [[thread]]
 thread = "net_worker"
 cpu = 5
+
+fps = 120
 ```
 
 ## Mode 类型
