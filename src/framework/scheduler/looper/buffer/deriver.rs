@@ -22,6 +22,7 @@ pub struct Deriver {
     pub pkg: String,
     pub cpuset: Cpuset,
     pub thread: Vec<Thread>,
+    pub fps: i32,
 }
 
 #[derive(Deserialize, Clone)]

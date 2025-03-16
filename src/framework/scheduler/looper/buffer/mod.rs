@@ -15,7 +15,8 @@
 // You should have received a copy of the GNU General Public License along
 // with AstraPulse. If not, see <https://www.gnu.org/licenses/>.
 
-pub mod deriver;
+mod deriver;
+mod feas;
 
 use std::{fs::read_dir, io::Write, path::Path, process::Command, thread};
 
@@ -28,14 +29,16 @@ use crate::{
     file_hander::{read, write},
 };
 use deriver::Deriver;
+use feas::Feas;
 
 use super::Mode;
 
 #[derive(Clone)]
 pub struct Buffer {
-    pub deriver: Vec<Deriver>,
-    pub mode: Mode,
-    pub topapps: String,
+    deriver: Vec<Deriver>,
+    mode: Mode,
+    topapps: String,
+    feas: Feas,
 }
 
 impl Buffer {
@@ -63,6 +66,7 @@ impl Buffer {
             deriver: deriver_struct,
             mode,
             topapps,
+            feas: Feas::new(),
         })
     }
 
@@ -120,6 +124,16 @@ impl Buffer {
                     "/dev/cpuset/system-background/cpus",
                     i.cpuset.system_background.as_str(),
                 )?;
+            }
+        }
+        Ok(())
+    }
+
+    pub fn try_enable_feas(&mut self) -> Result<()> {
+        for i in self.deriver.clone() {
+            if self.topapps == i.pkg {
+                self.feas.set_fps(i.fps);
+                self.feas.enable_feas()?;
             }
         }
         Ok(())
