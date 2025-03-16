@@ -5,3 +5,11 @@ top_app = "0-3"             # 通常为性能核心区间
 background = "4-5"         # 通常为能效核心区间
 foreground = "0-5"          # 所有可用核心
 system_background = "4-5" # 系统后台任务使用的核心
+
+[[thread]]  # 注意这里是复数形式，需调整结构体为 Vec<Thread>
+thread = "io_worker"
+cpu = 4
+
+[[thread]]
+thread = "net_worker"
+cpu = 5
