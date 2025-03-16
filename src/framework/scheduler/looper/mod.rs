@@ -149,6 +149,7 @@ impl Looper {
         let _ = buffer.try_set_cpuset();
         let _ = buffer.try_set_cpu();
         let _ = buffer.try_set_touch();
+        let _ = buffer.try_set_thread();
         let _ = Self::try_init_priority(mode.clone());
     }
 }

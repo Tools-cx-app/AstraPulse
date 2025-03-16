@@ -17,9 +17,10 @@
 
 pub mod deriver;
 
-use std::{fs::read_dir, io::Write, path::Path, process::Command};
+use std::{fs::read_dir, io::Write, path::Path, process::Command, thread};
 
 use anyhow::{Context, Result};
+use libc::cpu_set_t;
 use tempfile::NamedTempFile;
 
 use crate::{
@@ -119,6 +120,65 @@ impl Buffer {
                     "/dev/cpuset/system-background/cpus",
                     i.cpuset.system_background.as_str(),
                 )?;
+            }
+        }
+        Ok(())
+    }
+
+    fn find_tid(pid: u32, thread_name: &str) -> Result<u32> {
+        let task_dir = format!("/proc/{}/task", pid);
+        if let Ok(entries) = std::fs::read_dir(task_dir) {
+            for entry in entries.flatten() {
+                let tid_str = entry.file_name().into_string().unwrap_or_default();
+                let tid = tid_str.parse::<u32>()?;
+                let comm_path = format!("/proc/{}/task/{}/comm", pid, tid);
+                if let Ok(comm) = std::fs::read_to_string(comm_path) {
+                    if comm.trim() == thread_name {
+                        return Ok(tid);
+                    }
+                }
+            }
+        }
+        Ok(0)
+    }
+
+    pub fn try_set_thread(&self) -> Result<()> {
+        for i in self.deriver.clone() {
+            if self.topapps == i.pkg {
+                thread::spawn(move || {
+                    for thread in i.thread {
+                        let pid = match super::find_pid(i.pkg.as_str()) {
+                            Ok(p) => p,
+                            Err(e) => {
+                                log::error!("无法获取pid：{e}");
+                                continue;
+                            }
+                        };
+                        let tid = match Self::find_tid(pid, thread.thread.as_str()) {
+                            Ok(t) => t as libc::pid_t,
+                            Err(e) => {
+                                log::error!("无法获取tid：{e}");
+                                continue;
+                            }
+                        };
+                        unsafe {
+                            let mut set = std::mem::MaybeUninit::<cpu_set_t>::uninit();
+                            let set_ptr = set.as_mut_ptr();
+                            let set_ref = &mut *set_ptr;
+                            libc::CPU_ZERO(set_ref);
+                            libc::CPU_SET(thread.cpu as usize, set_ref);
+                            if libc::sched_setaffinity(
+                                tid,
+                                std::mem::size_of::<cpu_set_t>(),
+                                set_ptr as *const _,
+                            ) != 0
+                            {
+                                let err = std::io::Error::last_os_error();
+                                log::error!("无法设置进程亲和度：{err}");
+                            }
+                        }
+                    }
+                });
             }
         }
         Ok(())

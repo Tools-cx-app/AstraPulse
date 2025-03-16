@@ -21,6 +21,13 @@ use serde::Deserialize;
 pub struct Deriver {
     pub pkg: String,
     pub cpuset: Cpuset,
+    pub thread: Vec<Thread>,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct Thread {
+    pub thread: String,
+    pub cpu: usize,
 }
 
 #[derive(Deserialize, Clone)]
