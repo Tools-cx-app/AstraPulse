@@ -17,7 +17,7 @@
   - `cpu` = `policy`
 
     - `cpu`: 不可变
-      - `policy`: usize类型，必须为0-7
+      - `policy`: usize类型，必须为`0-7`
 ## config/里文件选项
 
 - ### `pkg`
@@ -35,6 +35,14 @@
 
 - `background` = `String`
 - `String`: 为用户后台应用的cpu使用核心(必须为`0-7`)
+
+- ### `thread`
+
+- `thread` = `String`
+- `String`: 为需要绑定的线程
+
+- `cpu` = `usize`
+- `usize`: usize类型，为线程需要绑定的cpu
 
 ## Mode类型
 
